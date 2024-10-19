@@ -22,7 +22,7 @@ CREATE TABLE `products` (
   `id` VARCHAR(40) UNIQUE NOT NULL,
   `type_id` VARCHAR(40) NOT NULL,
   `name` VARCHAR(100),
-  `description` VARCHAR(255),
+  `description` LONGTEXT,
   `price` FLOAT NOT NULL,
   `quantity` INT NOT NULL,
   `created_at` DATETIME,
