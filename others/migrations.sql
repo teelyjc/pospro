@@ -11,7 +11,7 @@ CREATE TABLE `users` (
 CREATE TABLE `product_types` (
   `id` VARCHAR(40) UNIQUE NOT NULL,
   `name` VARCHAR(100),
-  `description` VARCHAR(100),
+  `description` LONGTEXT,
   `created_at` DATETIME,
   `updated_at` DATETIME,
 
