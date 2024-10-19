@@ -36,7 +36,9 @@ use function Partial\Navbar;
 Header("แดชบอร์ด");
 Navbar($user);
 ?>
-<h1 class="text-center my-2">
-  Dashboard
-</h1>
+<div class="container my-2">
+  <h1 class="text-center">
+    Dashboard
+  </h1>
+</div>
 <?php Footer() ?>
