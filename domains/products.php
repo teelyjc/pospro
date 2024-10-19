@@ -20,6 +20,17 @@ interface IProductRepository
 {
   public function createProduct(Product $product): void;
   public function getProductById(string $id): Product | null;
+  /**
+   * @return Product[]
+   */
+  public function getProducts(): array;
 }
 
-interface IProductUsecases {}
+interface IProductUsecases
+{
+  public function createProduct(string $typeId, string $name, string $description, float $price, int $quantity): void;
+  /**
+   * @return Product[]
+   */
+  public function getProducts(): array;
+}

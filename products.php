@@ -72,13 +72,52 @@ Header("สินค้า");
 Navbar($user);
 ?>
 
-<div class="container w-75 m-5">
+<div class="container w-75 mt-3">
   <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#createProductTypeModal">
     เพิ่มหมวดหมู่สินค้าที่นี่
   </button>
   <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#createProductModal">
     เพิ่มสินค้าที่นี่
   </button>
+
+  <table class="table table-striped border mt-3">
+    <thead>
+      <tr>
+        <th scope="col">#</th>
+        <th scope="col">ประเภทสินค้า</th>
+        <th scope="col">ชื่อสินค้า</th>
+        <th scope="col">คำอธิบายสินค้า</th>
+        <th scope="col">ราคา(บาท)</th>
+        <th scope="col">จำนวน(ชิ้น)</th>
+        <th scope="col">แก้ไข</th>
+        <th scope="col">ลบ</th>
+      </tr>
+    </thead>
+    <tbody>
+      <?php
+      $i = 0;
+      foreach ($productRepository->getProducts() as $product) {
+        $i++
+      ?>
+        <tr>
+          <th scope="row"><?php echo $i ?></th>
+          <td><?php echo $productTypeUsecases->getProductTypeById($product->typeId)->name ?></td>
+          <td><?php echo $product->name ?></td>
+          <td><?php echo $product->description ?></td>
+          <td><?php echo $product->price ?></td>
+          <td><?php echo $product->quantity ?></td>
+          <td>
+            <button class="btn btn-secondary w-100">แก้ไข</button>
+          </td>
+          <td>
+            <button class="btn btn-danger w-100">ลบ</button>
+          </td>
+        </tr>
+      <?php
+      }
+      ?>
+    </tbody>
+  </table>
 </div>
 
 <div class="modal fade" id="createProductTypeModal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="createProductTypeModalLabel" aria-hidden="true">

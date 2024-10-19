@@ -68,4 +68,39 @@ class ProductRepository implements IProductRepository
       die("Failed to get product from MySQL: " . $e->getMessage());
     }
   }
+
+  public function getProducts(): array
+  {
+    try {
+      $products = array();
+
+      $stmt = $this->conn
+        ->prepare("SELECT products.* FROM products ORDER BY created_at DESC");
+      $stmt->execute();
+
+      $results = $stmt->fetchAll(PDO::FETCH_ASSOC);
+      if (!$results) {
+        return null;
+      }
+
+      foreach ($results as $result) {
+        $product = new Product();
+
+        $product->id = $result["id"] ?? "";
+        $product->typeId = $result["type_id"] ?? "";
+        $product->name = $result["name"] ?? "";
+        $product->description = $result["description"] ?? "";
+        $product->price = $result["price"] ?? 0.0;
+        $product->quantity = $result["quantity"] ?? 0;
+        $product->createdAt = $result["created_at"] ? new DateTime($result["created_at"]) : new DateTime("now");
+        $product->updatedAt = $result["updated_at"] ? new DateTime($result["updated_at"]) : new DateTime("now");
+
+        array_push($products, $product);
+      }
+
+      return $products;
+    } catch (Exception $e) {
+      die("Failed to get products from MySQL: " . $e->getMessage());
+    }
+  }
 }

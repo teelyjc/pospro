@@ -31,4 +31,10 @@ class ProductUsecases implements IProductUsecases
 
     $this->productRepository->createProduct($product);
   }
+
+  public function getProducts(): array
+  {
+    $products = $this->productRepository->getProducts();
+    return $products;
+  }
 }
