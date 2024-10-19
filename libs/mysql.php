@@ -16,7 +16,7 @@ class MySQL
     try {
       $connection = new PDO(
         sprintf(
-          "mysql:host=%s;port=%s;dbname=%s",
+          "mysql:host=%s;port=%s;dbname=%s;charset=utf8",
           MYSQL_HOST,
           MYSQL_PORT,
           MYSQL_DB
