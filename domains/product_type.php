@@ -13,6 +13,24 @@ class ProductType
   public DateTime $updatedAt;
 }
 
-interface IProductTypeRepository {}
+interface IProductTypeRepository
+{
+  public function createProductType(ProductType $productType): void;
+  public function getProductTypeById(string $id): ProductType | null;
 
-interface IProductTypeUsecases {}
+  /**
+   * @return ProductType[]
+   */
+  public function getProductTypes(): array;
+}
+
+interface IProductTypeUsecases
+{
+  public function createProductType(string $name, string $description): void;
+  public function getProductTypeById(string $id): ProductType | null;
+
+  /**
+   * @return ProductType[]
+   */
+  public function getProductTypes(): array;
+}
