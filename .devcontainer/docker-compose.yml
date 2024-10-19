@@ -1,0 +1,35 @@
+name: final-term-3-project
+
+services:
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    volumes:
+      - ../..:/workspaces:cached
+    command: sleep infinity
+    networks:
+      - internal
+
+  maria:
+    image: mariadb:10.4
+    restart: always
+    volumes:
+      - ./.mysql:/var/lib/mysql
+    environment:
+      MARIADB_ROOT_PASSWORD: password
+    networks:
+      - internal
+
+  phpmyadmin:
+    image: phpmyadmin:5
+    restart: always
+    environment:
+      PMA_HOST: maria
+    ports:
+      - 8000:80
+    networks:
+      - internal
+
+networks:
+  internal:
