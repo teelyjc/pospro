@@ -48,4 +48,10 @@ class ProductUsecases implements IProductUsecases
     $product = $this->productRepository->getProductById($id);
     return $product;
   }
+
+  public function getTotalProducts(): int
+  {
+    $total = $this->productRepository->getTotalProducts();
+    return $total;
+  }
 }

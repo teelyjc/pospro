@@ -25,6 +25,7 @@ interface IProductRepository
    */
   public function getProducts(int $offset, int $limit): array;
   public function deleteProductById(string $id): void;
+  public function getTotalProducts(): int;
 }
 
 interface IProductUsecases
@@ -36,4 +37,5 @@ interface IProductUsecases
   public function getProducts(int $offset, int $limit): array;
   public function getProductById(string $id): Product;
   public function deleteProductById(string $id): void;
+  public function getTotalProducts(): int;
 }

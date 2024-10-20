@@ -38,7 +38,7 @@ $productTypeUsecases = new ProductTypeUsecases($productTypeRepository);
 $productUsecases = new ProductUsecases($productRepository);
 
 $productsPerPage = 10;
-$productsPages = 1;
+$productsCurrentPages = 1;
 
 /** Post's Method handlers for 3 actions */
 if ($_SERVER["REQUEST_METHOD"] === "POST") {
@@ -69,14 +69,14 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
 }
 
 if ($_SERVER["REQUEST_METHOD"] === "GET") {
-  $productsPages = isset($_GET["page"]) ? $_GET["page"] : $productsPages;
+  $productsCurrentPages = isset($_GET["page"]) ? $_GET["page"] : $productsCurrentPages;
   $productsPerPage = isset($_GET["limit"]) ? $_GET["limit"] : $productsPerPage;
 }
 
-$optionsForProductsLimit = array(5, 10, 15, 25, 50);
+$optionsForProductsLimit = array(5, 10, 15, 25, 50, 100);
 
 $user = $authUsecases->authenticate();
-$products = $productUsecases->getProducts($productsPerPage, ($productsPages - 1) * $productsPerPage);
+$products = $productUsecases->getProducts($productsPerPage, ($productsCurrentPages - 1) * $productsPerPage);
 
 /** ERR_REDIRECT_01 PREVENTION */
 include "./includes/partials/header.php";
@@ -159,47 +159,31 @@ Navbar($user);
       ?>
     </tbody>
   </table>
-
-  <nav aria-label="Page navigator for products">
+  <nav aria-label="Page navigation for products">
+    <?php
+    $productsTotal = $productUsecases->getTotalProducts();
+    $productsPages = ceil($productsTotal / $productsPerPage);
+    ?>
     <ul class="pagination justify-content-center">
+      <li class="page-item">
+        <a class="page-link" href="?page=<?= $productsCurrentPages - 1 ?>" aria-label="Previous">
+          <span aria-hidden="true">&laquo;</span>
+        </a>
+      </li>
       <?php
-      $previous = $productsPages - 1;
-      $next = $productsPages + 1;
-      ?>
-      <?php
-      if ($previous !== 0) {
+      for ($i = 1; $i <= $productsPages; $i++) {
       ?>
         <li class="page-item">
-          <a class="page-link" href="?page=<?= $previous ?>" aria-label="Previous">
-            <span aria-hidden="true">&laquo;</span>
-          </a>
+          <a class="page-link" href="?page=<?= $i ?>"><?= $i ?></a>
         </li>
       <?php
       }
       ?>
-      <?php
-      $i = 0;
-      for ($i = 0; $i <= ceil(count($products) / $productsPerPage); $i++) {
-      ?>
-        <li class="page-item">
-          <a class="page-link" href="?page=<?= $i + 1 ?>">
-            <?= $i + 1 ?>
-          </a>
-        </li>
-      <?php
-      }
-      ?>
-      <?php
-      if ($next + 1 > $i) {
-      ?>
-        <li class="page-item">
-          <a class="page-link" href="?page=<?= $next ?>" aria-label="Next">
-            <span aria-hidden="true">&raquo;</span>
-          </a>
-        </li>
-      <?php
-      }
-      ?>
+      <li class="page-item">
+        <a class="page-link" href="?page=<?= $productsCurrentPages + 1 ?>" aria-label="Next">
+          <span aria-hidden="true">&raquo;</span>
+        </a>
+      </li>
     </ul>
   </nav>
 </div>

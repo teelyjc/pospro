@@ -120,4 +120,18 @@ class ProductRepository implements IProductRepository
       die("Failed to delete products from MySQL" . $e->getMessage());
     }
   }
+
+  public function getTotalProducts(): int
+  {
+    try {
+      $stmt = $this->conn
+        ->prepare("SELECT COUNT(*) as total FROM products");
+      $stmt->execute();
+
+      $result = $stmt->fetch();
+      return $result["total"];
+    } catch (Exception $e) {
+      die("Failed to count products from MySQL" . $e->getMessage());
+    }
+  }
 }
