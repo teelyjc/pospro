@@ -23,7 +23,8 @@ interface IProductRepository
   /**
    * @return Product[]
    */
-  public function getProducts(): array;
+  public function getProducts(int $offset, int $limit): array;
+  public function deleteProductById(string $id): void;
 }
 
 interface IProductUsecases
@@ -32,5 +33,7 @@ interface IProductUsecases
   /**
    * @return Product[]
    */
-  public function getProducts(): array;
+  public function getProducts(int $offset, int $limit): array;
+  public function getProductById(string $id): Product;
+  public function deleteProductById(string $id): void;
 }
