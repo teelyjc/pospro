@@ -23,7 +23,7 @@ class AuthUsecases implements IAuthUsecases
 
   public function authenticate(bool $redirect = true): User | null
   {
-    if ($_SESSION[AuthUsecases::CURRENT_USER]) {
+    if (isset($_SESSION[AuthUsecases::CURRENT_USER])) {
       $userId = $_SESSION[AuthUsecases::CURRENT_USER];
       return $this->userUsecases->getUserById($userId);
     }
