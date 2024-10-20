@@ -38,7 +38,9 @@ Navbar($user);
 ?>
 <div class="container my-2">
   <h1 class="text-center">
-    Dashboard
+    แดชบอร์ด
   </h1>
+
+  <a href="products.php">จัดการสินค้า</a>
 </div>
 <?php Footer() ?>
