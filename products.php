@@ -16,6 +16,7 @@ require_once "./generators/uuid.php";
 const CREAET_PRODUCT_KEY = "create_product";
 const CREATE_PRODUCT_TYPE_KEY = "create_product_type";
 const DELETE_PRODUCT_KEY = "delete_product_by_id";
+const UPDATE_PRODUCT_KEY = "update_product_by_id";
 
 use Repository\UserRepository;
 use Usecases\UserUsecases;
@@ -61,10 +62,21 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
     $productTypeUsecases->createProductType($name, $description);
   }
 
-  /** Handle Post's Method for Delete ProductById */
+  /** Handle Post's Method for delete product by id */
   if (isset($_POST[DELETE_PRODUCT_KEY])) {
     $productId = isset($_POST["product_id"]) ? $_POST["product_id"] : "";
     $productUsecases->deleteProductById($productId);
+  }
+
+  /** Handle Post's Method for update product by id */
+  if (isset($_POST[UPDATE_PRODUCT_KEY])) {
+    $id = isset($_POST["id"]) ? $_POST["id"] : "";
+    $name = isset($_POST["name"]) ? $_POST["name"] : "";
+    $description = isset($_POST["description"]) ? $_POST["description"] : "";
+    $price = isset($_POST["price"]) ? $_POST["price"] : 0;
+    $quantity = isset($_POST["quantity"]) ? $_POST["quantity"] : 0;
+
+    $productUsecases->updateProductById($id, $name, $description, $price, $quantity);
   }
 }
 
@@ -140,12 +152,21 @@ Navbar($user);
           <td><?= number_format($product->price) ?></td>
           <td><?= number_format($product->quantity) ?></td>
           <td>
-            <button class="btn btn-warning w-100">แก้ไข</button>
+            <button
+              class="btn btn-warning w-100"
+              data-bs-toggle="modal"
+              data-bs-target="#updateProductModal"
+              data-id="<?= $product->id ?>"
+              data-name="<?= $product->name ?>"
+              data-description="<?= $product->description ?>"
+              data-price="<?= $product->price ?>"
+              data-quantity="<?= $product->quantity ?>">
+              แก้ไข</button>
           </td>
           <td>
             <button
               type="button"
-              class="btn btn-danger"
+              class="btn btn-danger w-100"
               data-bs-toggle="modal"
               data-bs-target="#deleteProductModal"
               data-id="<?= $product->id ?>"
@@ -257,7 +278,7 @@ Navbar($user);
           </div>
         </div>
         <div class="modal-footer">
-          <button type="button" class="btn btn-danger" data-bs-dismiss="modal">ยกเลิก</button>
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">ยกเลิก</button>
           <button type="submit" name="<?= CREAET_PRODUCT_KEY ?>" class="btn btn-success">เพิ่มสินค้า</button>
         </div>
       </div>
@@ -287,8 +308,48 @@ Navbar($user);
   </form>
 </div>
 
+<div class="modal fade" id="updateProductModal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="updateProductModalLabel" aria-hidden="true">
+  <form method="POST">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="updateProductModalLabel">แก้ไขสินค้า</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          <div class="mb-3">
+            <label for="name" class="form-label">รหัสสินค้า</label>
+            <input type="text" id="id" name="id" class="form-control" readonly>
+          </div>
+          <div class="mb-3">
+            <label for="name" class="form-label">ชื่อสินค้า</label>
+            <input type="text" id="name" name="name" class="form-control">
+          </div>
+          <div class="mb-3">
+            <label for="description" class="form-label">คำอธิบายสินค้า</label>
+            <input type="text" id="description" name="description" class="form-control">
+          </div>
+          <div class="mb-3">
+            <label for="price" class="form-label">ราคาสินค้า</label>
+            <input type="number" id="price" name="price" class="form-control">
+          </div>
+          <div class="mb-3">
+            <label for="quantity" class="form-label">จำนวนสินค้า</label>
+            <input type="number" id="quantity" name="quantity" class="form-control">
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">ยกเลิก</button>
+          <button type="submit" name="<?= UPDATE_PRODUCT_KEY ?>" class="btn btn-warning">แก้ไข</button>
+        </div>
+      </div>
+    </div>
+  </form>
+</div>
+
 <script>
   let deleteProductModal = document.getElementById("deleteProductModal");
+  let updateProductModal = document.getElementById("updateProductModal");
 
   deleteProductModal.addEventListener("show.bs.modal", (e) => {
     let btn = e.relatedTarget;
@@ -299,6 +360,22 @@ Navbar($user);
     deleteProductModal.querySelector("#product-name").textContent = productName;
     deleteProductModal.querySelector("#product-id-to-delete").value = productIdToDelete;
   });
+
+  updateProductModal.addEventListener("show.bs.modal", (e) => {
+    let btn = e.relatedTarget;
+
+    let productId = btn.getAttribute("data-id");
+    let productName = btn.getAttribute("data-name");
+    let productDescription = btn.getAttribute("data-description");
+    let productPrice = btn.getAttribute("data-price");
+    let productQuantity = btn.getAttribute("data-quantity");
+
+    updateProductModal.querySelector("#id").value = productId;
+    updateProductModal.querySelector("#name").value = productName;
+    updateProductModal.querySelector("#description").value = productDescription;
+    updateProductModal.querySelector("#price").value = productPrice;
+    updateProductModal.querySelector("#quantity").value = productQuantity;
+  })
 </script>
 
 <?php Footer(); ?>

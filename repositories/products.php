@@ -134,4 +134,22 @@ class ProductRepository implements IProductRepository
       die("Failed to count products from MySQL" . $e->getMessage());
     }
   }
+
+  public function updateProductById(Product $product): void
+  {
+    try {
+      $stmt = $this->conn
+        ->prepare("UPDATE products SET name = :name, description = :description, price = :price, quantity = :quantity, updated_at = NOW() WHERE id = :id");
+
+      $stmt->bindParam(":name", $product->name, PDO::PARAM_STR);
+      $stmt->bindParam(":description", $product->description, PDO::PARAM_STR);
+      $stmt->bindParam(":price", $product->price, PDO::PARAM_STR);
+      $stmt->bindParam(":quantity", $product->quantity, PDO::PARAM_STR);
+      $stmt->bindParam(":id", $product->id, PDO::PARAM_STR);
+
+      $stmt->execute();
+    } catch (Exception $e) {
+      die("Failed to update product to MySQL" . $e->getMessage());
+    }
+  }
 }
