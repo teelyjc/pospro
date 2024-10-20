@@ -15,6 +15,7 @@ require_once "./generators/uuid.php";
 
 const CREAET_PRODUCT_KEY = "create_product";
 const CREATE_PRODUCT_TYPE_KEY = "create_product_type";
+const DELETE_PRODUCT_KEY = "delete_product_by_id";
 
 use Repository\UserRepository;
 use Usecases\UserUsecases;
@@ -36,9 +37,12 @@ $authUsecases = new AuthUsecases($userUsecases);
 $productTypeUsecases = new ProductTypeUsecases($productTypeRepository);
 $productUsecases = new ProductUsecases($productRepository);
 
-$user = $authUsecases->authenticate();
+$productsPerPage = 10;
+$productsPages = 1;
 
+/** Post's Method handlers for 3 actions */
 if ($_SERVER["REQUEST_METHOD"] === "POST") {
+  /** Handle Post's Method for Create Product */
   if (isset($_POST[CREAET_PRODUCT_KEY])) {
     $typeId = isset($_POST["type_id"]) ? $_POST["type_id"] : "";
     $name = isset($_POST["name"]) ? $_POST["name"] : "";
@@ -49,13 +53,30 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
     $productUsecases->createProduct($typeId, $name, $description, $price, $quantity);
   }
 
+  /** Handle Post's Method for Create Product's Type */
   if (isset($_POST[CREATE_PRODUCT_TYPE_KEY])) {
     $name = isset($_POST["name"]) ? $_POST["name"] : "";
     $description = isset($_POST["description"]) ? $_POST["description"] : "";
 
     $productTypeUsecases->createProductType($name, $description);
   }
+
+  /** Handle Post's Method for Delete ProductById */
+  if (isset($_POST[DELETE_PRODUCT_KEY])) {
+    $productId = isset($_POST["product_id"]) ? $_POST["product_id"] : "";
+    $productUsecases->deleteProductById($productId);
+  }
 }
+
+if ($_SERVER["REQUEST_METHOD"] === "GET") {
+  $productsPages = isset($_GET["page"]) ? $_GET["page"] : $productsPages;
+  $productsPerPage = isset($_GET["limit"]) ? $_GET["limit"] : $productsPerPage;
+}
+
+$optionsForProductsLimit = array(5, 10, 15, 25, 50);
+
+$user = $authUsecases->authenticate();
+$products = $productUsecases->getProducts($productsPerPage, ($productsPages - 1) * $productsPerPage);
 
 /** ERR_REDIRECT_01 PREVENTION */
 include "./includes/partials/header.php";
@@ -73,13 +94,27 @@ Navbar($user);
 ?>
 
 <div class="container w-75 mt-3">
-  <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#createProductTypeModal">
-    เพิ่มหมวดหมู่สินค้าที่นี่
-  </button>
-  <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#createProductModal">
-    เพิ่มสินค้าที่นี่
-  </button>
+  <div class="d-flex justify-content-end">
+    <button class="btn btn-success mx-2" data-bs-toggle="modal" data-bs-target="#createProductTypeModal">
+      เพิ่มหมวดหมู่สินค้าที่นี่
+    </button>
+    <button class="btn btn-success mx-2" data-bs-toggle="modal" data-bs-target="#createProductModal">
+      เพิ่มสินค้าที่นี่
+    </button>
+  </div>
 
+  <form method="GET" class="mt-3">
+    <select name="limit" class="form-select" onchange="this.form.submit()">
+      <option selected>เลือกจำนวนสินค้าที่ต้องการแสดง</option>
+      <?php
+      foreach ($optionsForProductsLimit as $v) {
+      ?>
+        <option value="<?= $v ?>"><?= $v ?></option>
+      <?php
+      }
+      ?>
+    </select>
+  </form>
   <table class="table table-striped border mt-3">
     <thead>
       <tr>
@@ -95,22 +130,28 @@ Navbar($user);
     </thead>
     <tbody>
       <?php
-      $i = 0;
-      foreach ($productRepository->getProducts() as $product) {
-        $i++
+      foreach ($products as $i => $product) {
       ?>
         <tr>
-          <th scope="row"><?php echo $i ?></th>
-          <td><?php echo $productTypeUsecases->getProductTypeById($product->typeId)->name ?></td>
-          <td><?php echo $product->name ?></td>
-          <td><?php echo $product->description ?></td>
-          <td><?php echo $product->price ?></td>
-          <td><?php echo $product->quantity ?></td>
+          <th scope="row"><?= $i + 1 ?></th>
+          <td><?= $productTypeUsecases->getProductTypeById($product->typeId)->name ?></td>
+          <td><?= $product->name ?></td>
+          <td><?= $product->description ?></td>
+          <td><?= number_format($product->price) ?></td>
+          <td><?= number_format($product->quantity) ?></td>
           <td>
-            <button class="btn btn-secondary w-100">แก้ไข</button>
+            <button class="btn btn-warning w-100">แก้ไข</button>
           </td>
           <td>
-            <button class="btn btn-danger w-100">ลบ</button>
+            <button
+              type="button"
+              class="btn btn-danger"
+              data-bs-toggle="modal"
+              data-bs-target="#deleteProductModal"
+              data-id="<?= $product->id ?>"
+              data-name="<?= $product->name ?>">
+              ลบ
+            </button>
           </td>
         </tr>
       <?php
@@ -118,6 +159,49 @@ Navbar($user);
       ?>
     </tbody>
   </table>
+
+  <nav aria-label="Page navigator for products">
+    <ul class="pagination justify-content-center">
+      <?php
+      $previous = $productsPages - 1;
+      $next = $productsPages + 1;
+      ?>
+      <?php
+      if ($previous !== 0) {
+      ?>
+        <li class="page-item">
+          <a class="page-link" href="?page=<?= $previous ?>" aria-label="Previous">
+            <span aria-hidden="true">&laquo;</span>
+          </a>
+        </li>
+      <?php
+      }
+      ?>
+      <?php
+      $i = 0;
+      for ($i = 0; $i <= ceil(count($products) / $productsPerPage); $i++) {
+      ?>
+        <li class="page-item">
+          <a class="page-link" href="?page=<?= $i + 1 ?>">
+            <?= $i + 1 ?>
+          </a>
+        </li>
+      <?php
+      }
+      ?>
+      <?php
+      if ($next + 1 > $i) {
+      ?>
+        <li class="page-item">
+          <a class="page-link" href="?page=<?= $next ?>" aria-label="Next">
+            <span aria-hidden="true">&raquo;</span>
+          </a>
+        </li>
+      <?php
+      }
+      ?>
+    </ul>
+  </nav>
 </div>
 
 <div class="modal fade" id="createProductTypeModal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="createProductTypeModalLabel" aria-hidden="true">
@@ -140,7 +224,7 @@ Navbar($user);
         </div>
         <div class="modal-footer">
           <button type="button" class="btn btn-danger" data-bs-dismiss="modal">ยกเลิก</button>
-          <button type="submit" name="<?php echo CREATE_PRODUCT_TYPE_KEY ?>" class="btn btn-success">เพิ่มหมวดหมู่สินค้า</button>
+          <button type="submit" name="<?= CREATE_PRODUCT_TYPE_KEY ?>" class="btn btn-success">เพิ่มหมวดหมู่สินค้า</button>
         </div>
       </div>
     </div>
@@ -163,8 +247,8 @@ Navbar($user);
               <?php
               foreach ($productTypeUsecases->getProductTypes() as $productType) {
               ?>
-                <option value="<?php echo $productType->id ?>">
-                  <?php echo $productType->name ?>
+                <option value="<?= $productType->id ?>">
+                  <?= $productType->name ?>
                 </option>
               <?php
               }
@@ -190,11 +274,47 @@ Navbar($user);
         </div>
         <div class="modal-footer">
           <button type="button" class="btn btn-danger" data-bs-dismiss="modal">ยกเลิก</button>
-          <button type="submit" name="<?php echo CREAET_PRODUCT_KEY ?>" class="btn btn-success">เพิ่มสินค้า</button>
+          <button type="submit" name="<?= CREAET_PRODUCT_KEY ?>" class="btn btn-success">เพิ่มสินค้า</button>
         </div>
       </div>
     </div>
   </form>
 </div>
+
+<div class="modal fade" id="deleteProductModal" tabindex="-1" aria-labelledby="deleteProductModalLabel" aria-hidden="true">
+  <form method="POST">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="deleteProductModalLabel">คุณต้องการที่จะลบสินค้าชิ้นนี้</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          <b>เมื่อลบ <span id="product-name" class="text-danger"></span> จะไม่สามารถกู้คืนได้</b><br>
+          คุณต้องการที่จะลบใช่หรือไม่ ?
+        </div>
+        <div class="modal-footer">
+          <input type="hidden" name="product_id" id="product-id-to-delete">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">ยกเลิก</button>
+          <button type="submit" name="<?= DELETE_PRODUCT_KEY ?>" class="btn btn-danger">ลบ</button>
+        </div>
+      </div>
+    </div>
+  </form>
+</div>
+
+<script>
+  let deleteProductModal = document.getElementById("deleteProductModal");
+
+  deleteProductModal.addEventListener("show.bs.modal", (e) => {
+    let btn = e.relatedTarget;
+
+    let productIdToDelete = btn.getAttribute("data-id");
+    let productName = btn.getAttribute("data-name")
+
+    deleteProductModal.querySelector("#product-name").textContent = productName;
+    deleteProductModal.querySelector("#product-id-to-delete").value = productIdToDelete;
+  });
+</script>
 
 <?php Footer(); ?>

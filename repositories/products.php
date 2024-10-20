@@ -69,19 +69,25 @@ class ProductRepository implements IProductRepository
     }
   }
 
-  public function getProducts(): array
+  public function getProducts(int $limit = 5, int $offset = 0): array
   {
     try {
       $products = array();
 
       $stmt = $this->conn
-        ->prepare("SELECT products.* FROM products ORDER BY created_at DESC");
+        ->prepare("
+        SELECT products.*
+        FROM products
+        ORDER BY created_at DESC
+        LIMIT :limit OFFSET :offset
+        ");
+
+      $stmt->bindParam(":limit", $limit, PDO::PARAM_INT);
+      $stmt->bindParam(":offset", $offset, PDO::PARAM_INT);
+
       $stmt->execute();
 
       $results = $stmt->fetchAll(PDO::FETCH_ASSOC);
-      if (!$results) {
-        return null;
-      }
 
       foreach ($results as $result) {
         $product = new Product();
@@ -101,6 +107,17 @@ class ProductRepository implements IProductRepository
       return $products;
     } catch (Exception $e) {
       die("Failed to get products from MySQL: " . $e->getMessage());
+    }
+  }
+
+  public function deleteProductById(string $id): void
+  {
+    try {
+      $stmt = $this->conn
+        ->prepare("DELETE FROM products WHERE id = ?");
+      $stmt->execute([$id]);
+    } catch (Exception $e) {
+      die("Failed to delete products from MySQL" . $e->getMessage());
     }
   }
 }

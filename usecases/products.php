@@ -32,9 +32,20 @@ class ProductUsecases implements IProductUsecases
     $this->productRepository->createProduct($product);
   }
 
-  public function getProducts(): array
+  public function getProducts(int $limit = 5, int $offset = 0): array
   {
-    $products = $this->productRepository->getProducts();
+    $products = $this->productRepository->getProducts($limit, $offset);
     return $products;
+  }
+
+  public function deleteProductById(string $id): void
+  {
+    $this->productRepository->deleteProductById($id);
+  }
+
+  public function getProductById(string $id): Product
+  {
+    $product = $this->productRepository->getProductById($id);
+    return $product;
   }
 }
