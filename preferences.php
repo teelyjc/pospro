@@ -18,11 +18,15 @@ $userRepository = new UserRepository($mysql);
 $userUsecases = new UserUsecases($userRepository);
 $authUsecases = new AuthUsecases($userUsecases);
 
+const UPDATE_USER_PREFERENCES = "updateUserPreferences";
+const UPDATE_USER_PASSWORD = "updateUserPassword";
+const DEACTIVATE_USER = "deactivateUser";
+
 $user = $authUsecases->authenticate();
 AuthUsecases::RedirectSignIn($user);
 
 if ($_SERVER["REQUEST_METHOD"] === "POST") {
-  if (isset($_POST["update_user_password"])) {
+  if (isset($_POST[UPDATE_USER_PASSWORD])) {
     $currentPassword = isset($_POST["current_password"]) ? $_POST["current_password"] : "";
     $newPassword = isset($_POST["new_password"]) ? $_POST["new_password"] : "";
     $confirmNewPassword = isset($_POST["confirm_new_password"]) ? $_POST["confirm_new_password"] : "";
@@ -30,11 +34,19 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
     $userUsecases->updateUserPasswordById($user->id, $currentPassword, $newPassword, $confirmNewPassword);
   }
 
-  if (isset($_POST["deactivate_user"])) {
+  if (isset($_POST[DEACTIVATE_USER])) {
     $password = isset($_POST["password"]) ? $_POST["password"] : "";
 
     $userUsecases->deactivateUserById($user->id, $password);
-    // $authUsecases->signout();
+    $authUsecases->signout();
+  }
+
+  if (isset($_POST[UPDATE_USER_PREFERENCES])) {
+    $firstname = isset($_POST["firstname"]) ? $_POST["firstname"] : "";
+    $lastname = isset($_POST["lastname"]) ? $_POST["lastname"] : "";
+    $password = isset($_POST["password"]) ? $_POST["password"] : "";
+
+    $userUsecases->updateFirstnameAndLastnameById($user->id, $password, $firstname, $lastname);
   }
 }
 
@@ -58,6 +70,40 @@ Navbar($user);
   </h1>
 
   <form method="POST" class="border w-75 p-5 mx-auto">
+    <h1>แก้ไขข้อมูลส่วนตัว</h1>
+    <div class="mb-3">
+      <label for="firstname" class="form-label">ชื่อจริง</label>
+      <input type="text" class="form-control" name="firstname" value="<?= $user->firstname ?>">
+    </div>
+    <div class="mb-3">
+      <label for="lastname" class="form-label">นามสกุล</label>
+      <input type="text" class="form-control" name="lastname" value="<?= $user->lastname ?>">
+    </div>
+    <div class="mb-3">
+      <label for="current_password" class="form-label">รหัสผ่าน</label>
+      <input type="password" class="form-control" name="password">
+    </div>
+    <?php
+    if (!empty($_SESSION[UserUsecases::UPDATE_PREFERENCES_ERROR_KEY])) {
+    ?>
+      <div class="alert alert-danger"><?php echo $_SESSION[UserUsecases::UPDATE_PREFERENCES_ERROR_KEY] ?></div>
+    <?php
+      unset($_SESSION[UserUsecases::UPDATE_PREFERENCES_ERROR_KEY]);
+    }
+    ?>
+
+    <?php
+    if (!empty($_SESSION[UserUsecases::UPDATE_PREFERENCES_SUCCESS_KEY])) {
+    ?>
+      <div class="alert alert-success"><?php echo $_SESSION[UserUsecases::UPDATE_PREFERENCES_SUCCESS_KEY] ?></div>
+    <?php
+      unset($_SESSION[UserUsecases::UPDATE_PREFERENCES_SUCCESS_KEY]);
+    }
+    ?>
+    <button type="submit" name="<?= UPDATE_USER_PREFERENCES ?>" class="btn btn-success">แก้ไขข้อมูลส่วนตัว</button>
+  </form>
+
+  <form method="POST" class="border w-75 p-5 mx-auto mt-3">
     <h1>แก้ไขรหัสผ่าน</h1>
     <div class="mb-3">
       <label for="current_password" class="form-label">รหัสผ่านปัจจุบัน</label>
@@ -72,23 +118,23 @@ Navbar($user);
       <input type="password" class="form-control" name="confirm_new_password">
     </div>
     <?php
-    if (!empty($_SESSION[UserUsecases::ERROR_KEY])) {
+    if (!empty($_SESSION[UserUsecases::UPDATE_PASSWORD_ERROR_KEY])) {
     ?>
-      <div class="alert alert-danger"><?php echo $_SESSION[UserUsecases::ERROR_KEY] ?></div>
+      <div class="alert alert-danger"><?php echo $_SESSION[UserUsecases::UPDATE_PASSWORD_ERROR_KEY] ?></div>
     <?php
-      unset($_SESSION[UserUsecases::ERROR_KEY]);
+      unset($_SESSION[UserUsecases::UPDATE_PASSWORD_ERROR_KEY]);
     }
     ?>
 
     <?php
-    if (!empty($_SESSION[UserUsecases::SUCCESS_KEY])) {
+    if (!empty($_SESSION[UserUsecases::UPDATE_PASSWORD_SUCCESS_KEY])) {
     ?>
-      <div class="alert alert-success"><?php echo $_SESSION[UserUsecases::SUCCESS_KEY] ?></div>
+      <div class="alert alert-success"><?php echo $_SESSION[UserUsecases::UPDATE_PASSWORD_SUCCESS_KEY] ?></div>
     <?php
-      unset($_SESSION[UserUsecases::SUCCESS_KEY]);
+      unset($_SESSION[UserUsecases::UPDATE_PASSWORD_SUCCESS_KEY]);
     }
     ?>
-    <button type="submit" name="update_user_password" class="btn btn-success">แก้ไข</button>
+    <button type="submit" name="<?= UPDATE_USER_PASSWORD ?>" class="btn btn-success">แก้ไข</button>
   </form>
 
   <form method="POST" class="border w-75 p-5 mx-auto mt-3">
@@ -99,23 +145,23 @@ Navbar($user);
       <div class="form-text">หลังจากยกเลิกบัญชีแล้ว เราจะทำการเก็บข้อมูลของคุณไว้ 30 วันก่อนที่จะทำการลบ คุณสามารถที่จะขอข้อมูลกลับได้ที่ผู้ดูแลระบบ</div>
     </div>
     <?php
-    if (!empty($_SESSION[UserUsecases::ERROR_DEACTIVATE_KEY])) {
+    if (!empty($_SESSION[UserUsecases::DEACTIVATE_ERROR_KEY])) {
     ?>
-      <div class="alert alert-danger"><?php echo $_SESSION[UserUsecases::ERROR_DEACTIVATE_KEY] ?></div>
+      <div class="alert alert-danger"><?php echo $_SESSION[UserUsecases::DEACTIVATE_ERROR_KEY] ?></div>
     <?php
-      unset($_SESSION[UserUsecases::ERROR_DEACTIVATE_KEY]);
+      unset($_SESSION[UserUsecases::DEACTIVATE_ERROR_KEY]);
     }
     ?>
 
     <?php
-    if (!empty($_SESSION[UserUsecases::SUCCESS_KEY])) {
+    if (!empty($_SESSION[UserUsecases::DEACTIVATE_SUCCESS_KEY])) {
     ?>
-      <div class="alert alert-success"><?php echo $_SESSION[UserUsecases::SUCCESS_KEY] ?></div>
+      <div class="alert alert-success"><?php echo $_SESSION[UserUsecases::DEACTIVATE_SUCCESS_KEY] ?></div>
     <?php
-      unset($_SESSION[UserUsecases::SUCCESS_KEY]);
+      unset($_SESSION[UserUsecases::DEACTIVATE_SUCCESS_KEY]);
     }
     ?>
-    <button type="submit" name="deactivate_user" class="btn btn-danger">ลบบัญชี</button>
+    <button type="submit" name="<?= DEACTIVATE_USER ?>" class="btn btn-danger">ลบบัญชี</button>
   </form>
 </div>
 <?php Footer() ?>
