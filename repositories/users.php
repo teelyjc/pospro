@@ -70,16 +70,34 @@ class UserRepository implements IUserRepository
 
   public function getUsers(): array
   {
-    return array();
+    try {
+      $stmt = $this->conn
+        ->prepare(
+          "SELECT users.* FROM users WHERE is_deleted = 0"
+        );
+      $stmt->execute();
+      $rows = $stmt->fetchAll(PDO::FETCH_ASSOC);
+      $users = array();
+
+      foreach ($rows as $row) {
+        array_push($users, User::Fetch($row));
+      }
+
+      return $users;
+    } catch (Exception $e) {
+      die("Failed to get users from MySQL: " . $e->getMessage());
+    }
   }
 
   public function updateUser(User $user): void
   {
     try {
       $stmt = $this->conn
-        ->prepare("UPDATE users SET password = :password, updated_at = NOW() WHERE id = :id");
+        ->prepare("UPDATE users SET password = :password, firstname = :firstname, lastname = :lastname, updated_at = NOW() WHERE id = :id");
 
       $stmt->bindParam(":password", $user->password, PDO::PARAM_STR);
+      $stmt->bindParam(":firstname", $user->firstname, PDO::PARAM_STR);
+      $stmt->bindParam(":lastname", $user->lastname, PDO::PARAM_STR);
       $stmt->bindParam(":id", $user->id, PDO::PARAM_STR);
 
       $stmt->execute();
