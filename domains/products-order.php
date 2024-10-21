@@ -13,6 +13,12 @@ class ProductsOrder
   public DateTime $updatedAt;
 }
 
-interface IProductsOrderRepository {}
+interface IProductsOrderRepository
+{
+  public function getTotalProductsFromOrderId(string $orderId): int;
+}
 
-interface IProductsOrderUsecases {}
+interface IProductsOrderUsecases
+{
+  public function getTotalProductsFromOrderId(string $orderId): int;
+}
