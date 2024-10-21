@@ -67,4 +67,9 @@ class ProductUsecases implements IProductUsecases
 
     $this->productRepository->updateProductById($product);
   }
+
+  public function deleteProductsByProductTypeId(string $id): void
+  {
+    $this->productRepository->deleteProductsByProductTypeId($id);
+  }
 }

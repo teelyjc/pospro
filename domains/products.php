@@ -27,6 +27,7 @@ interface IProductRepository
   public function deleteProductById(string $id): void;
   public function getTotalProducts(): int;
   public function updateProductById(Product $product): void;
+  public function deleteProductsByProductTypeId(string $id): void;
 }
 
 interface IProductUsecases
@@ -40,4 +41,5 @@ interface IProductUsecases
   public function deleteProductById(string $id): void;
   public function getTotalProducts(): int;
   public function updateProductById(string $id, string $name, string $description, float $price, int $quantity): void;
+  public function deleteProductsByProductTypeId(string $id): void;
 }
