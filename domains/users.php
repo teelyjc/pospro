@@ -26,6 +26,7 @@ class User
   public string | null $password = null;
   public string | null $firstname = null;
   public string | null $lastname = null;
+  public Role $role;
   public DateTime $createdAt;
   public DateTime $updatedAt;
 
@@ -33,6 +34,13 @@ class User
   {
     return $this->id;
   }
+}
+
+enum Role
+{
+  case Customer;
+  case Seller;
+  case Administrator;
 }
 
 interface IUserRepository
@@ -58,4 +66,5 @@ interface IUserUsecases
   public function getUserById(string $id): User | null;
   public function updateUserPasswordById(string $id, string $currentPassword, string $newPassword, string $confirmNewPassword): void;
   public function deactivateUserById(string $id, string $password): void;
+  public function updateFirstnameAndLastnameById(string $id, string $password, string $firstname, string $lastname): void;
 }
