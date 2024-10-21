@@ -29,9 +29,8 @@ interface IOrderRepository
 {
   public function createOrder(Order $order): void;
   public function deleteOrderById(string $id): void;
-  /**
-   * @return Order[]
-   */
+
+  /** @return Order[] */
   public function getOrdersByUserId(string $id): array;
   public function getOrderById(string $id): Order | null;
   public function updateOrderByOrder(Order $order): void;
@@ -40,10 +39,9 @@ interface IOrderRepository
 interface IOrderUsecases
 {
   public function createOrder(string $userId, string $label): void;
-  public function deleteOrder(string $id): void;
-  public function updateOrder(string $label): void;
-  /**
-   * @return Order[]
-   */
+  public function deleteOrderById(string $id): void;
+  public function updateOrder(string $id, string $label): void;
+
+  /** @return Order[] */
   public function getOrdersByUserId(string $userId): array;
 }
