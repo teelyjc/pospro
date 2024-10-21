@@ -15,10 +15,16 @@ class User
     $user->password = $row["password"] ?? "";
     $user->firstname = $row["firstname"] ?? "";
     $user->lastname = $row["lastname"] ?? "";
+    $user->profilePath = $row["profile_path"] ?? "";
     $user->createdAt = $row["created_at"] ? new DateTime($row["created_at"]) : new DateTime("now");
     $user->updatedAt = $row["updated_at"] ? new DateTime($row["updated_at"]) : new DateTime("now");
 
     return $user;
+  }
+
+  public static function getUserProfilePath(string $profilePath): string
+  {
+    return "./uploads" . $profilePath;
   }
 
   public string | null $id = null;
@@ -26,6 +32,7 @@ class User
   public string | null $password = null;
   public string | null $firstname = null;
   public string | null $lastname = null;
+  public string | null $profilePath = null;
   public Role $role;
   public DateTime $createdAt;
   public DateTime $updatedAt;

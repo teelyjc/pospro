@@ -93,11 +93,12 @@ class UserRepository implements IUserRepository
   {
     try {
       $stmt = $this->conn
-        ->prepare("UPDATE users SET password = :password, firstname = :firstname, lastname = :lastname, updated_at = NOW() WHERE id = :id");
+        ->prepare("UPDATE users SET password = :password, firstname = :firstname, lastname = :lastname, profile_path = :profile_path, updated_at = NOW() WHERE id = :id");
 
       $stmt->bindParam(":password", $user->password, PDO::PARAM_STR);
       $stmt->bindParam(":firstname", $user->firstname, PDO::PARAM_STR);
       $stmt->bindParam(":lastname", $user->lastname, PDO::PARAM_STR);
+      $stmt->bindParam(":profile_path", $user->profilePath, PDO::PARAM_STR);
       $stmt->bindParam(":id", $user->id, PDO::PARAM_STR);
 
       $stmt->execute();

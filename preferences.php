@@ -1,12 +1,14 @@
 <?php
 session_start();
 
+require_once "./domains/users.php";
 require_once "./repositories/users.php";
 require_once "./usecases/users.php";
 require_once "./usecases/auth.php";
 require_once "./libs/mysql.php";
 require_once "./libs/constants.php";
 
+use Domain\User;
 use Repository\UserRepository;
 use Usecases\UserUsecases;
 use Libs\MySQL;
@@ -21,6 +23,9 @@ $authUsecases = new AuthUsecases($userUsecases);
 const UPDATE_USER_PREFERENCES = "updateUserPreferences";
 const UPDATE_USER_PASSWORD = "updateUserPassword";
 const DEACTIVATE_USER = "deactivateUser";
+const UPLOAD_USER_PROFILE_IMAGE = "uploadUserProfile";
+
+$allowExtensions = array("png", "jpg", "jpeg");
 
 $user = $authUsecases->authenticate();
 AuthUsecases::RedirectSignIn($user);
@@ -48,6 +53,21 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
 
     $userUsecases->updateFirstnameAndLastnameById($user->id, $password, $firstname, $lastname);
   }
+
+  if (isset($_POST[UPLOAD_USER_PROFILE_IMAGE])) {
+    $filename = $_FILES["profile_image"]["tmp_name"];
+    $destination = __DIR__ . "/uploads/users/" . $user->id;
+
+    $file = $destination . "/" . $_FILES["profile_image"]["name"];
+    $filepath = "/users" . "/" . $user->id . "/" . $_FILES["profile_image"]["name"];
+
+    if (!file_exists($destination)) {
+      mkdir($destination, 775, true);
+    }
+
+    move_uploaded_file($filename, $file);
+    $userUsecases->updateUserProfile($user->id, $filepath);
+  }
 }
 
 /** ERR_REDIRECT_01 PREVENTION */
@@ -69,7 +89,26 @@ Navbar($user);
     ตั้งค่าผู้ใช้งาน
   </h1>
 
-  <form method="POST" class="border w-75 p-5 mx-auto">
+  <form method="POST" enctype="multipart/form-data" class="border w-75 p-5 mx-auto">
+    <h1>แก้ไขรูปภาพโปรไฟล์</h1>
+    <img
+      id="profileImagePreview"
+      width="200"
+      height="200"
+      class="rounded-circle mx-auto d-flex border"
+      <?php
+      if ($user->profilePath) {
+        echo "src=\"" . User::getUserProfilePath($user->profilePath) . "\"";
+      }
+      ?>>
+    <div class="mb-3">
+      <label for="formFile" class="form-label">รูปภาพโปรไฟล์</label>
+      <input class="form-control" type="file" name="profile_image" id="profileImage" accept=".png.jpg.jpeg">
+    </div>
+    <button type="submit" name="<?= UPLOAD_USER_PROFILE_IMAGE ?>" class="btn btn-success w-100">อัพโหลดรูปภาพของคุณ</button>
+  </form>
+
+  <form method="POST" class="border w-75 p-5 mx-auto mt-3">
     <h1>แก้ไขข้อมูลส่วนตัว</h1>
     <div class="mb-3">
       <label for="firstname" class="form-label">ชื่อจริง</label>
@@ -100,7 +139,7 @@ Navbar($user);
       unset($_SESSION[UserUsecases::UPDATE_PREFERENCES_SUCCESS_KEY]);
     }
     ?>
-    <button type="submit" name="<?= UPDATE_USER_PREFERENCES ?>" class="btn btn-success">แก้ไขข้อมูลส่วนตัว</button>
+    <button type="submit" name="<?= UPDATE_USER_PREFERENCES ?>" class="btn btn-success w-100">แก้ไขข้อมูลส่วนตัว</button>
   </form>
 
   <form method="POST" class="border w-75 p-5 mx-auto mt-3">
@@ -134,7 +173,7 @@ Navbar($user);
       unset($_SESSION[UserUsecases::UPDATE_PASSWORD_SUCCESS_KEY]);
     }
     ?>
-    <button type="submit" name="<?= UPDATE_USER_PASSWORD ?>" class="btn btn-success">แก้ไข</button>
+    <button type="submit" name="<?= UPDATE_USER_PASSWORD ?>" class="btn btn-success w-100">แก้ไข</button>
   </form>
 
   <form method="POST" class="border w-75 p-5 mx-auto mt-3">
@@ -161,7 +200,18 @@ Navbar($user);
       unset($_SESSION[UserUsecases::DEACTIVATE_SUCCESS_KEY]);
     }
     ?>
-    <button type="submit" name="<?= DEACTIVATE_USER ?>" class="btn btn-danger">ลบบัญชี</button>
+    <button type="submit" name="<?= DEACTIVATE_USER ?>" class="btn btn-danger w-100">ลบบัญชี</button>
   </form>
 </div>
+
+<script>
+  const profileChanger = document.getElementById("profileImage");
+  profileChanger.addEventListener("change", (e) => {
+    const previewer = document.getElementById("profileImagePreview");
+    previewer.setAttribute("src", URL.createObjectURL(e.target.files[0]));
+    previewer.onload = () => {
+      URL.revokeObjectURL(previewer.src);
+    }
+  });
+</script>
 <?php Footer() ?>

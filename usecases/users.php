@@ -164,6 +164,14 @@ class UserUsecases implements IUserUsecases
     unset($_SESSION[UserUsecases::UPDATE_PREFERENCES_ERROR_KEY]);
   }
 
+  public function updateUserProfile(string $id, string $profilePath): void
+  {
+    $user = $this->userRepository->getUserById($id);
+    $user->profilePath = $profilePath;
+
+    $this->userRepository->updateUser($user);
+  }
+
   public function getUsers(): array
   {
     $users = $this->userRepository->getUsers();
