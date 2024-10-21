@@ -82,11 +82,31 @@ class UserUsecases implements IUserUsecases
     return $user;
   }
 
-  public function updateUserPasswordById(string $id, string $currentPassword, string $newPassword): void
+  public function updateUserPasswordById(string $id, string $currentPassword, string $newPassword, string $confirmNewPasssword): void
   {
     $user = $this->userRepository->getUserById($id);
     if (!$user) {
       $_SESSION[UserUsecases::ERROR_KEY] = "ไม่พบผู้ใช้งาน";
+      return;
+    }
+
+    if (empty($currentPassword)) {
+      $_SESSION[UserUsecases::ERROR_KEY] = "กรุณากรอกรหัสผ่านปัจจุบัน";
+      return;
+    }
+
+    if (empty($newPassword)) {
+      $_SESSION[UserUsecases::ERROR_KEY] = "กรุณากรอกรหัสผ่านใหม่";
+      return;
+    }
+
+    if (empty($confirmNewPasssword)) {
+      $_SESSION[UserUsecases::ERROR_KEY] = "กรุณายืนยันรหัสผ่านใหม่";
+      return;
+    }
+
+    if (strlen($newPassword) <= 7) {
+      $_SESSION[UserUsecases::ERROR_KEY] = "รหัสผ่านควรมีมากกว่าหรือเท่ากับ 8 ตัวอักษร";
       return;
     }
 
@@ -102,6 +122,11 @@ class UserUsecases implements IUserUsecases
     $userUpdate->id = $user->id;
     $userUpdate->password = $newHashed;
 
-    $this->userRepository->updateUser($userUpdate);
+    if ($newPassword === $confirmNewPasssword) {
+      $this->userRepository->updateUser($userUpdate);
+      $_SESSION[UserUsecases::SUCCESS_KEY] = "แก้ไขรหัสผ่านสำเร็จแล้ว";
+    } else {
+      $_SESSION[UserUsecases::ERROR_KEY] = "รหัสผ่านใหม่ไม่ตรงกันกับยืนยันรหัสผ่านใหม่";
+    }
   }
 }
