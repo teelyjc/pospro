@@ -11,7 +11,6 @@ require_once "./usecases/products.php";
 require_once "./usecases/product_type.php";
 require_once "./libs/mysql.php";
 require_once "./libs/constants.php";
-require_once "./generators/uuid.php";
 
 const CREAET_PRODUCT_KEY = "create_product";
 const CREATE_PRODUCT_TYPE_KEY = "create_product_type";
