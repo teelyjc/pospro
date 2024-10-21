@@ -3,11 +3,12 @@
 namespace Usecases;
 
 use Domain\IOrderRepository;
+use Domain\IOrderUsecases;
 use Domain\IUserRepository;
 use Domain\Order;
 use Generator\Generator;
 
-class OrderUsecases
+class OrderUsecases implements IOrderUsecases
 {
   private readonly IOrderRepository $orderRepository;
   private readonly IUserRepository $userRepository;
@@ -31,14 +32,16 @@ class OrderUsecases
     $this->orderRepository->createOrder($order);
   }
 
-  public function deleteOrder(string $id): void
+  public function deleteOrderById(string $id): void
   {
     $this->orderRepository->deleteOrderById($id);
   }
 
-  public function updateOrder(string $label): void
+  public function updateOrder(string $id, string $label): void
   {
-    $order = new Order();
+    $order = $this->orderRepository->getOrderById($id);
+
+    $order->id = $id;
     $order->label = $label;
 
     $this->orderRepository->updateOrderByOrder($order);
