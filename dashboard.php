@@ -21,6 +21,9 @@ $userUsecases = new UserUsecases($userRepository);
 $authUsecases = new AuthUsecases($userUsecases);
 
 $user = $authUsecases->authenticate();
+if (!$user) {
+  header("Location: signin.php");
+}
 
 /** ERR_REDIRECT_01 PREVENTION */
 include "./includes/partials/header.php";
