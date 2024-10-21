@@ -22,4 +22,5 @@ Navbar();
     ระบบ Point Of Sales ที่ประสิทธิภาพสูงด้วย PHP
   </h1>
 </div>
+
 <?php Footer() ?>
