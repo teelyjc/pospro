@@ -38,6 +38,8 @@ $authUsecases = new AuthUsecases($userUsecases);
 $productTypeUsecases = new ProductTypeUsecases($productTypeRepository);
 $productUsecases = new ProductUsecases($productRepository);
 
+$user = $authUsecases->authenticate();
+
 $productsPerPage = 10;
 $productsCurrentPages = 1;
 
@@ -86,8 +88,6 @@ if ($_SERVER["REQUEST_METHOD"] === "GET") {
 }
 
 $optionsForProductsLimit = array(5, 10, 15, 25, 50, 100);
-
-$user = $authUsecases->authenticate();
 $products = $productUsecases->getProducts($productsPerPage, ($productsCurrentPages - 1) * $productsPerPage);
 
 /** ERR_REDIRECT_01 PREVENTION */
