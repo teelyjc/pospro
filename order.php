@@ -9,8 +9,6 @@ require_once "./usecases/order.php";
 require_once "./libs/mysql.php";
 require_once "./libs/constants.php";
 
-require_once "./generators/uuid.php";
-
 use Repository\UserRepository;
 use Usecases\UserUsecases;
 use Libs\MySQL;
