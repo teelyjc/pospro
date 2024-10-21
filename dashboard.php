@@ -7,8 +7,6 @@ require_once "./usecases/auth.php";
 require_once "./libs/mysql.php";
 require_once "./libs/constants.php";
 
-require_once "./generators/uuid.php";
-
 use Repository\UserRepository;
 use Usecases\UserUsecases;
 use Libs\MySQL;
@@ -41,8 +39,11 @@ Navbar($user);
 ?>
 <div class="container my-4">
   <h1 class="text-center">
-    แดชบอร์ด
+    ยินดีต้อนรับคุณ <?= !empty($user->firstname) ? $user->firstname : $user->username ?> !
   </h1>
+  <p class="text-center">
+    แดชบอร์ด
+  </p>
 
   <div>
     <a href="products.php">จัดการสินค้า</a>
