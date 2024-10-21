@@ -20,12 +20,24 @@ function Navbar(User | null $user = null)
           <li class="nav-item">
             <a class="nav-link active" aria-current="page" href="index.php">หน้าแรก</a>
           </li>
+          <?php
+          if ($user) {
+          ?>
+            <li class="nav-item">
+              <a href="dashboard.php" class="nav-link">แดชบอร์ด</a>
+            </li>
+          <?php
+          }
+          ?>
         </ul>
         <div class="d-flex">
           <ul class="navbar-nav me-auto mb-2 mb-lg-0">
             <?php
             if ($user) {
             ?>
+              <li class="nav-item">
+                <a href="preferences.php" class="nav-link">การตั้งค่า</a>
+              </li>
               <li class="nav-item">
                 <a href="signout.php" class="nav-link">ออกจากระบบ</a>
               </li>
