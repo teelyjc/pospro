@@ -37,7 +37,7 @@ class UserRepository implements IUserRepository
   {
     try {
       $stmt = $this->conn
-        ->prepare("SELECT users.* FROM users WHERE id = ?");
+        ->prepare("SELECT users.* FROM users WHERE id = ? AND is_deleted = 0");
       $stmt->execute([$id]);
       $result = $stmt->fetch(PDO::FETCH_ASSOC);
       if (!$result) {
@@ -54,7 +54,7 @@ class UserRepository implements IUserRepository
   {
     try {
       $stmt = $this->conn
-        ->prepare("SELECT users.* FROM users WHERE username = ?");
+        ->prepare("SELECT users.* FROM users WHERE username = ? AND is_deleted = 0");
       $stmt->execute([$username]);
 
       $row = $stmt->fetch(PDO::FETCH_ASSOC);
@@ -83,6 +83,18 @@ class UserRepository implements IUserRepository
       $stmt->bindParam(":id", $user->id, PDO::PARAM_STR);
 
       $stmt->execute();
+    } catch (Exception $e) {
+      die("Failed to update user to MySQL" . $e->getMessage());
+    }
+  }
+
+  public function deactivateUserById(string $id): void
+  {
+    try {
+      $stmt = $this->conn
+        ->prepare("UPDATE users SET is_deleted = 1, updated_at = NOW() WHERE id = ?");
+
+      $stmt->execute([$id]);
     } catch (Exception $e) {
       die("Failed to update user to MySQL" . $e->getMessage());
     }

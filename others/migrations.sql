@@ -4,7 +4,7 @@ CREATE TABLE `users` (
   `password` VARCHAR(255),
   `created_at` DATETIME,
   `updated_at` DATETIME,
-
+  `is_deleted` BOOLEAN NOT NULL DEFAULT 0,
   PRIMARY KEY(`id`)
 );
 
