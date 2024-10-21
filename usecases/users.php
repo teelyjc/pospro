@@ -15,6 +15,7 @@ use Generator\Generator;
 class UserUsecases implements IUserUsecases
 {
   public const ERROR_KEY = "ErrorMessage";
+  public const ERROR_DEACTIVATE_KEY = "ErrorDeactivateMessage";
   public const SUCCESS_KEY = "SuccessMessage";
 
   private readonly IUserRepository $userRepository;
@@ -128,5 +129,16 @@ class UserUsecases implements IUserUsecases
     } else {
       $_SESSION[UserUsecases::ERROR_KEY] = "รหัสผ่านใหม่ไม่ตรงกันกับยืนยันรหัสผ่านใหม่";
     }
+  }
+
+  public function deactivateUserById(string $id, string $password): void
+  {
+    $user = $this->userRepository->getUserById($id);
+    if (!password_verify($password, $user->password)) {
+      $_SESSION[UserUsecases::ERROR_DEACTIVATE_KEY] = "รหัสผ่านไม่ถูกต้อง";
+      return;
+    }
+
+    $this->userRepository->deactivateUserById($id);
   }
 }
