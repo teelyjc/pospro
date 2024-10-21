@@ -16,7 +16,7 @@ include "./includes/partials/navbar.php";
 Header("หน้าแรก");
 Navbar();
 ?>
-<div class="container mt-3">
+<div class="container my-4">
   <h1 class="text-center">
     Cr-PosPro ทำเรื่องขายให้เป็นเรื่องง่าย<br>
     ระบบ Point Of Sales ที่ประสิทธิภาพสูงด้วย PHP

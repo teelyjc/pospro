@@ -33,14 +33,12 @@ use function Partial\Navbar;
 ?>
 
 <?php
-Header("แดชบอร์ด");
+Header("การตั้งค่า");
 Navbar($user);
 ?>
 <div class="container my-4">
   <h1 class="text-center">
-    แดชบอร์ด
+    ตั้งค่าผู้ใช้งาน
   </h1>
-
-  <a href="products.php">จัดการสินค้า</a>
 </div>
 <?php Footer() ?>

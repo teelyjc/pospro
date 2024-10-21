@@ -52,7 +52,7 @@ Header("สมัครสมาชิก");
 Navbar();
 ?>
 
-<form method="POST" class="border p-5 rounded mx-auto mt-5 w-75">
+<form method="POST" class="border p-5 rounded mx-auto my-4 w-75">
   <h1 class="text-center">สมัครสมาชิกกับ PosPro</h1>
   <div class="mb-3">
     <label for="username" class="form-label">ชื่อผู้ใช้งาน</label>
