@@ -41,6 +41,7 @@ CREATE TABLE
   `orders` (
     `id` VARCHAR(40) UNIQUE NOT NULL,
     `owner_id` VARCHAR(40) NOT NULL,
+    `label` VARCHAR(100),
     `created_at` DATETIME,
     `updated_at` DATETIME,
     PRIMARY KEY (`id`),
