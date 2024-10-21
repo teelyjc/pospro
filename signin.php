@@ -66,7 +66,7 @@ Navbar($isAuthenticate);
   <?php
   if (!empty($_SESSION[AuthUsecases::ERROR_KEY])) {
   ?>
-    <p><?php echo $_SESSION[AuthUsecases::ERROR_KEY] ?></p>
+    <div class="alert alert-danger"><?php echo $_SESSION[AuthUsecases::ERROR_KEY] ?></div>
   <?php
     unset($_SESSION[AuthUsecases::ERROR_KEY]);
   }
