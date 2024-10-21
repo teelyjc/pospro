@@ -107,6 +107,9 @@ Navbar($user);
 ?>
 
 <div class="container w-75 mt-3">
+  <h1 class="text-center">
+    จัดการสินค้า
+  </h1>
   <div class="d-flex justify-content-end">
     <button class="btn btn-success mx-2" data-bs-toggle="modal" data-bs-target="#createProductTypeModal">
       เพิ่มหมวดหมู่สินค้าที่นี่
