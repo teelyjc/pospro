@@ -51,5 +51,5 @@ interface IUserUsecases
   public function signup(string $username, string $password, string $confirmPassword): void;
   public function getUserByUsername(string $username): User | null;
   public function getUserById(string $id): User | null;
-  public function updateUserPasswordById(string $id, string $currentPassword, string $newPassword): void;
+  public function updateUserPasswordById(string $id, string $currentPassword, string $newPassword, string $confirmNewPassword): void;
 }
