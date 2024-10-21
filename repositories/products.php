@@ -25,8 +25,9 @@ class ProductRepository implements IProductRepository
   {
     try {
       $stmt = $this->conn
-        ->prepare("INSERT INTO products (id, type_id, name, description, price, quantity, created_at, updated_at)
-        VALUES (:id, :type_id, :name, :description, :price, :quantity, NOW(), NOW())");
+        ->prepare(
+          "INSERT INTO products (id, type_id, name, description, price, quantity, created_at, updated_at) VALUES (:id, :type_id, :name, :description, :price, :quantity, NOW(), NOW())"
+        );
 
       $stmt->execute([
         ":id" => $product->id,
@@ -75,12 +76,12 @@ class ProductRepository implements IProductRepository
       $products = array();
 
       $stmt = $this->conn
-        ->prepare("
-        SELECT products.*
-        FROM products
-        ORDER BY created_at DESC
-        LIMIT :limit OFFSET :offset
-        ");
+        ->prepare(
+          "SELECT products.*
+          FROM products
+          ORDER BY created_at DESC
+          LIMIT :limit OFFSET :offset"
+        );
 
       $stmt->bindParam(":limit", $limit, PDO::PARAM_INT);
       $stmt->bindParam(":offset", $offset, PDO::PARAM_INT);
@@ -150,6 +151,22 @@ class ProductRepository implements IProductRepository
       $stmt->execute();
     } catch (Exception $e) {
       die("Failed to update product to MySQL" . $e->getMessage());
+    }
+  }
+
+  public function deleteProductsByProductTypeId(string $id): void
+  {
+    try {
+      $stmt = $this->conn
+        ->prepare(
+          "DELETE products
+          FROM products
+          JOIN product_types ON products.type_id = product_types.id
+          WHERE product_types.id = ?"
+        );
+      $stmt->execute([$id]);
+    } catch (Exception $e) {
+      die("Failed to delete products from MySQL: " . $e->getMessage());
     }
   }
 }
