@@ -44,6 +44,13 @@ Navbar($user);
     แดชบอร์ด
   </h1>
 
-  <a href="products.php">จัดการสินค้า</a>
+  <div>
+    <a href="products.php">จัดการสินค้า</a>
+    <br>
+
+    <a href="product-types.php">จัดการประเภทสินค้า</a>
+    <br>
+  </div>
+
 </div>
 <?php Footer() ?>
