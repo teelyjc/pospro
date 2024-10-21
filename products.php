@@ -195,7 +195,10 @@ Navbar($user);
       for ($i = 1; $i <= $productsPages; $i++) {
       ?>
         <li class="page-item">
-          <a class="page-link" href="?page=<?= $i ?>"><?= $i ?></a>
+          <a
+            class="page-link <?= ($productsCurrentPages == $i) ? "active" : "" ?>"
+            href="?page=<?= $i ?>"><?= $i ?>
+          </a>
         </li>
       <?php
       }
