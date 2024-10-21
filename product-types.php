@@ -1,13 +1,13 @@
 <?php
 session_start();
 
-require_once "./domains/product_type.php";
+require_once "./domains/product-types.php";
 require_once "./repositories/users.php";
-require_once "./repositories/product_type.php";
+require_once "./repositories/product-types.php";
 require_once "./repositories/products.php";
 require_once "./usecases/users.php";
 require_once "./usecases/auth.php";
-require_once "./usecases/product_type.php";
+require_once "./usecases/product-types.php";
 require_once "./usecases/products.php";
 require_once "./libs/mysql.php";
 require_once "./libs/constants.php";
