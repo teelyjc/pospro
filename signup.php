@@ -73,20 +73,20 @@ Navbar();
   </div>
 
   <?php
-  if (!empty($_SESSION[UserUsecases::ERROR_KEY])) {
+  if (!empty($_SESSION[UserUsecases::SIGNUP_ERROR_KEY])) {
   ?>
-    <p><?php echo $_SESSION[UserUsecases::ERROR_KEY] ?></p>
+    <p><?php echo $_SESSION[UserUsecases::SIGNUP_ERROR_KEY] ?></p>
   <?php
-    unset($_SESSION[UserUsecases::ERROR_KEY]);
+    unset($_SESSION[UserUsecases::SIGNUP_ERROR_KEY]);
   }
   ?>
 
   <?php
-  if (!empty($_SESSION[UserUsecases::SUCCESS_KEY])) {
+  if (!empty($_SESSION[UserUsecases::SIGNUP_SUCCESS_KEY])) {
   ?>
-    <p><?php echo $_SESSION[UserUsecases::SUCCESS_KEY] ?></p>
+    <p><?php echo $_SESSION[UserUsecases::SIGNUP_SUCCESS_KEY] ?></p>
   <?php
-    unset($_SESSION[UserUsecases::SUCCESS_KEY]);
+    unset($_SESSION[UserUsecases::SIGNUP_SUCCESS_KEY]);
   }
   ?>
 
