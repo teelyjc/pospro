@@ -39,6 +39,7 @@ $productTypeUsecases = new ProductTypeUsecases($productTypeRepository);
 $productUsecases = new ProductUsecases($productRepository);
 
 $user = $authUsecases->authenticate();
+AuthUsecases::RedirectSignIn($user);
 
 $productsPerPage = 10;
 $productsCurrentPages = 1;
