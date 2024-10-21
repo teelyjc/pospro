@@ -49,7 +49,7 @@ CREATE TABLE
   );
 
 CREATE TABLE
-  `product_orders` (
+  `products_orders` (
     `id` VARCHAR(40) UNIQUE NOT NULL,
     `product_id` VARCHAR(100),
     `order_id` VARCHAR(100),
