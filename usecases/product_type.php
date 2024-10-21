@@ -53,4 +53,9 @@ class ProductTypeUsecases implements IProductTypeUsecases
   {
     $this->productTypeRepository->deleteProductTypeById($id);
   }
+
+  public function getTotalProductsByProductTypeId(string $id): int
+  {
+    return $this->productTypeRepository->getTotalProductsByProductTypeId($id);
+  }
 }

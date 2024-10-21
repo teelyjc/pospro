@@ -100,6 +100,7 @@ class ProductTypeRepository implements IProductTypeRepository
         );
       $stmt->bindParam(":name", $productType->name, PDO::PARAM_STR);
       $stmt->bindParam(":description", $productType->description, PDO::PARAM_STR);
+      $stmt->bindParam(":id", $productType->id, PDO::PARAM_STR);
 
       $stmt->execute();
     } catch (Exception $e) {
@@ -111,11 +112,29 @@ class ProductTypeRepository implements IProductTypeRepository
     try {
       $stmt = $this->conn
         ->prepare(
-          "DELETE product_types WHERE id = ?"
+          "DELETE product_types FROM product_types WHERE id = ?"
         );
       $stmt->execute([$id]);
     } catch (Exception $e) {
-      die("Failed to update product_types to MySQL" . $e->getMessage());
+      die("Failed to delete product_types to MySQL: " . $e->getMessage());
+    }
+  }
+
+  public function getTotalProductsByProductTypeId(string $id): int
+  {
+    try {
+      $stmt = $this->conn
+        ->prepare(
+          "SELECT COUNT(*) as count
+          FROM products
+          JOIN product_types ON products.type_id = product_types.id
+          WHERE product_types.id = :id"
+        );
+      $stmt->bindParam(":id", $id, PDO::PARAM_STR);
+      $stmt->execute();
+      return $stmt->fetch()["count"];
+    } catch (Exception $e) {
+      die("Failed to get total products from MySQL" . $e->getMessage());
     }
   }
 }
