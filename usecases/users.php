@@ -81,4 +81,27 @@ class UserUsecases implements IUserUsecases
     $user = $this->userRepository->getUserById($id);
     return $user;
   }
+
+  public function updateUserPasswordById(string $id, string $currentPassword, string $newPassword): void
+  {
+    $user = $this->userRepository->getUserById($id);
+    if (!$user) {
+      $_SESSION[UserUsecases::ERROR_KEY] = "ไม่พบผู้ใช้งาน";
+      return;
+    }
+
+    if (!password_verify($currentPassword, $user->password)) {
+      $_SESSION[UserUsecases::ERROR_KEY] = "รหัสผ่านไม่ถูกต้อง";
+      return;
+    }
+
+    $newHashed = password_hash($newPassword, PASSWORD_BCRYPT, array("cost" => 10));
+
+    $userUpdate = new User();
+
+    $userUpdate->id = $user->id;
+    $userUpdate->password = $newHashed;
+
+    $this->userRepository->updateUser($userUpdate);
+  }
 }

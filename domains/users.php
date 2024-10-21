@@ -43,6 +43,7 @@ interface IUserRepository
 
   /** @return User[] */
   public function getUsers(): array;
+  public function updateUser(User $user): void;
 }
 
 interface IUserUsecases
@@ -50,4 +51,5 @@ interface IUserUsecases
   public function signup(string $username, string $password, string $confirmPassword): void;
   public function getUserByUsername(string $username): User | null;
   public function getUserById(string $id): User | null;
+  public function updateUserPasswordById(string $id, string $currentPassword, string $newPassword): void;
 }

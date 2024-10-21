@@ -72,4 +72,19 @@ class UserRepository implements IUserRepository
   {
     return array();
   }
+
+  public function updateUser(User $user): void
+  {
+    try {
+      $stmt = $this->conn
+        ->prepare("UPDATE users SET password = :password, updated_at = NOW() WHERE id = :id");
+
+      $stmt->bindParam(":password", $user->password, PDO::PARAM_STR);
+      $stmt->bindParam(":id", $user->id, PDO::PARAM_STR);
+
+      $stmt->execute();
+    } catch (Exception $e) {
+      die("Failed to update user to MySQL" . $e->getMessage());
+    }
+  }
 }
