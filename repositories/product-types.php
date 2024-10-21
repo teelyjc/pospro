@@ -2,7 +2,7 @@
 
 namespace Repository;
 
-require_once "./domains/product_type.php";
+require_once "./domains/product-types.php";
 require_once "./libs/mysql.php";
 
 use Domain\IProductTypeRepository;

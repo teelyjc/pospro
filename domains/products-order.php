@@ -4,7 +4,7 @@ namespace Domain;
 
 use DateTime;
 
-class ProductOrder
+class ProductsOrder
 {
   public string | null $id = null;
   public string | null $productId = null;
@@ -13,6 +13,6 @@ class ProductOrder
   public DateTime $updatedAt;
 }
 
-interface IProductOrderRepository {}
+interface IProductsOrderRepository {}
 
-interface IProductOrderUsecases {}
+interface IProductsOrderUsecases {}
