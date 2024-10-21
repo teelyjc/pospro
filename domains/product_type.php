@@ -22,6 +22,8 @@ interface IProductTypeRepository
    * @return ProductType[]
    */
   public function getProductTypes(): array;
+  public function updateProductTypeById(ProductType $productType): void;
+  public function deleteProductTypeById(string $id): void;
 }
 
 interface IProductTypeUsecases
@@ -33,4 +35,6 @@ interface IProductTypeUsecases
    * @return ProductType[]
    */
   public function getProductTypes(): array;
+  public function updateProductTypeById(string $id, string $name, string $description): void;
+  public function deleteProductTypeById(string $id): void;
 }

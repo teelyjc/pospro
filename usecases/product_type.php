@@ -38,4 +38,19 @@ class ProductTypeUsecases implements IProductTypeUsecases
     $productTypes = $this->productTypeRepository->getProductTypes();
     return $productTypes;
   }
+
+  public function updateProductTypeById(string $id, string $name, string $description): void
+  {
+    $productType = $this->productTypeRepository->getProductTypeById($id);
+
+    $productType->name = $name;
+    $productType->description = $description;
+
+    $this->productTypeRepository->updateProductTypeById($productType);
+  }
+
+  public function deleteProductTypeById(string $id): void
+  {
+    $this->productTypeRepository->deleteProductTypeById($id);
+  }
 }

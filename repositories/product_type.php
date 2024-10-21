@@ -90,4 +90,32 @@ class ProductTypeRepository implements IProductTypeRepository
       die("Failed to get product_types from MySQL: " . $e->getMessage());
     }
   }
+
+  public function updateProductTypeById(ProductType $productType): void
+  {
+    try {
+      $stmt = $this->conn
+        ->prepare(
+          "UPDATE product_types SET name = :name, description = :description, updated_at = NOW() WHERE id = :id"
+        );
+      $stmt->bindParam(":name", $productType->name, PDO::PARAM_STR);
+      $stmt->bindParam(":description", $productType->description, PDO::PARAM_STR);
+
+      $stmt->execute();
+    } catch (Exception $e) {
+      die("Failed to update product_types to MySQL" . $e->getMessage());
+    }
+  }
+  public function deleteProductTypeById(string $id): void
+  {
+    try {
+      $stmt = $this->conn
+        ->prepare(
+          "DELETE product_types WHERE id = ?"
+        );
+      $stmt->execute([$id]);
+    } catch (Exception $e) {
+      die("Failed to update product_types to MySQL" . $e->getMessage());
+    }
+  }
 }
