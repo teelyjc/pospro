@@ -3,6 +3,9 @@ CREATE TABLE
     `id` VARCHAR(40) UNIQUE NOT NULL,
     `username` VARCHAR(100) UNIQUE NOT NULL,
     `password` VARCHAR(255),
+    `firstname` VARCHAR(100),
+    `lastname` VARCHAR(100),
+    `role` ENUM ('CUSTOMER', 'SELLER', 'ADMINISTRATOR'),
     `created_at` DATETIME,
     `updated_at` DATETIME,
     `is_deleted` BOOLEAN NOT NULL DEFAULT 0,
@@ -36,11 +39,13 @@ CREATE TABLE
 CREATE TABLE
   `orders` (
     `id` VARCHAR(40) UNIQUE NOT NULL,
-    `owner_id` VARCHAR(40) NOT NULL,
+    `from_account` VARCHAR(40) NOT NULL,
+    `to_account` VARCHAR(40) NOT NULL,
     `created_at` DATETIME,
     `updated_at` DATETIME,
     PRIMARY KEY (`id`),
-    FOREIGN KEY (`owner_id`) REFERENCES `users` (`id`)
+    FOREIGN KEY (`from_account`) REFERENCES `users` (`id`),
+    FOREIGN KEY (`to_account`) REFERENCES `users` (`id`)
   );
 
 CREATE TABLE

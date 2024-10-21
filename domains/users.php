@@ -13,6 +13,8 @@ class User
     $user->id = $row["id"] ?? "";
     $user->username = $row["username"] ?? "";
     $user->password = $row["password"] ?? "";
+    $user->firstname = $row["firstname"] ?? "";
+    $user->lastname = $row["lastname"] ?? "";
     $user->createdAt = $row["created_at"] ? new DateTime($row["created_at"]) : new DateTime("now");
     $user->updatedAt = $row["updated_at"] ? new DateTime($row["updated_at"]) : new DateTime("now");
 
@@ -22,6 +24,8 @@ class User
   public string | null $id = null;
   public string | null $username = null;
   public string | null $password = null;
+  public string | null $firstname = null;
+  public string | null $lastname = null;
   public DateTime $createdAt;
   public DateTime $updatedAt;
 
