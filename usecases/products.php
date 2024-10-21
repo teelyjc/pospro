@@ -57,7 +57,7 @@ class ProductUsecases implements IProductUsecases
 
   public function updateProductById(string $id, string $name, string $description, float $price, int $quantity): void
   {
-    $product = new Product();
+    $product = $this->productRepository->getProductById($id);
 
     $product->id = $id;
     $product->name = $name;
