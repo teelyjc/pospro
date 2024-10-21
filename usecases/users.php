@@ -14,9 +14,14 @@ use Generator\Generator;
 
 class UserUsecases implements IUserUsecases
 {
-  public const ERROR_KEY = "ErrorMessage";
-  public const ERROR_DEACTIVATE_KEY = "ErrorDeactivateMessage";
-  public const SUCCESS_KEY = "SuccessMessage";
+  public const SIGNUP_ERROR_KEY = "signUpErrorMessage";
+  public const SIGNUP_SUCCESS_KEY = "signUpSuccessMessage";
+  public const DEACTIVATE_ERROR_KEY = "deactivateErrorMessage";
+  public const DEACTIVATE_SUCCESS_KEY = "deactivateSuccessMessage";
+  public const UPDATE_PASSWORD_ERROR_KEY = "updatePasswordErrorMessage";
+  public const UPDATE_PASSWORD_SUCCESS_KEY = "updatePasswordSuccessMessage";
+  public const UPDATE_PREFERENCES_ERROR_KEY = "updatePreferencesErrorMessage";
+  public const UPDATE_PREFERENCES_SUCCESS_KEY = "updatePreferencesSuccessMessage";
 
   private readonly IUserRepository $userRepository;
 
@@ -28,32 +33,32 @@ class UserUsecases implements IUserUsecases
   public function signup(string $username, string $password, string $confirmPassword): void
   {
     if (empty($username)) {
-      $_SESSION[UserUsecases::ERROR_KEY] = "กรุณากรอกชื่อผู้ใช้งาน";
+      $_SESSION[UserUsecases::SIGNUP_ERROR_KEY] = "กรุณากรอกชื่อผู้ใช้งาน";
       return;
     }
 
     if (strlen($username) <= 3) {
-      $_SESSION[UserUsecases::ERROR_KEY] = "กรุณาระบุชื่อผู้ใช้งานให้มากกว่า 3 ตัวอักษร";
+      $_SESSION[UserUsecases::SIGNUP_ERROR_KEY] = "กรุณาระบุชื่อผู้ใช้งานให้มากกว่า 3 ตัวอักษร";
       return;
     }
 
     if (empty($password)) {
-      $_SESSION[UserUsecases::ERROR_KEY] = "กรุณากรอกรหัสผ่าน";
+      $_SESSION[UserUsecases::SIGNUP_ERROR_KEY] = "กรุณากรอกรหัสผ่าน";
       return;
     }
 
     if (strlen($password) <= 7) {
-      $_SESSION[UserUsecases::ERROR_KEY] = "กรุณาระบุรหัสผ่านให้มากกว่า 8 ตัวอักษร";
+      $_SESSION[UserUsecases::SIGNUP_ERROR_KEY] = "กรุณาระบุรหัสผ่านให้มากกว่า 8 ตัวอักษร";
       return;
     }
 
     if ($password !== $confirmPassword) {
-      $_SESSION[UserUsecases::ERROR_KEY] = "กรุณายืนยันรหัสผ่านให้ตรงกัน";
+      $_SESSION[UserUsecases::SIGNUP_ERROR_KEY] = "กรุณายืนยันรหัสผ่านให้ตรงกัน";
       return;
     }
 
     if ($this->getUserByUsername($username) !== null) {
-      $_SESSION[UserUsecases::ERROR_KEY] = "ชื่อผู้ใช้งานนี้ถูกใช้ไปแล้ว";
+      $_SESSION[UserUsecases::SIGNUP_ERROR_KEY] = "ชื่อผู้ใช้งานนี้ถูกใช้ไปแล้ว";
       return;
     }
 
@@ -65,8 +70,8 @@ class UserUsecases implements IUserUsecases
 
     $this->userRepository->createUser($user);
 
-    $_SESSION[UserUsecases::SUCCESS_KEY] = "สมัครสมาชิกสำเร็จ";
-    unset($_SESSION[UserUsecases::ERROR_KEY]);
+    $_SESSION[UserUsecases::SIGNUP_SUCCESS_KEY] = "สมัครสมาชิกสำเร็จ";
+    unset($_SESSION[UserUsecases::SIGNUP_ERROR_KEY]);
 
     header(REDIRECT_TO_SIGNIN);
   }
@@ -87,32 +92,32 @@ class UserUsecases implements IUserUsecases
   {
     $user = $this->userRepository->getUserById($id);
     if (!$user) {
-      $_SESSION[UserUsecases::ERROR_KEY] = "ไม่พบผู้ใช้งาน";
+      $_SESSION[UserUsecases::UPDATE_PASSWORD_ERROR_KEY] = "ไม่พบผู้ใช้งาน";
       return;
     }
 
     if (empty($currentPassword)) {
-      $_SESSION[UserUsecases::ERROR_KEY] = "กรุณากรอกรหัสผ่านปัจจุบัน";
+      $_SESSION[UserUsecases::UPDATE_PASSWORD_ERROR_KEY] = "กรุณากรอกรหัสผ่านปัจจุบัน";
       return;
     }
 
     if (empty($newPassword)) {
-      $_SESSION[UserUsecases::ERROR_KEY] = "กรุณากรอกรหัสผ่านใหม่";
+      $_SESSION[UserUsecases::UPDATE_PASSWORD_ERROR_KEY] = "กรุณากรอกรหัสผ่านใหม่";
       return;
     }
 
     if (empty($confirmNewPasssword)) {
-      $_SESSION[UserUsecases::ERROR_KEY] = "กรุณายืนยันรหัสผ่านใหม่";
+      $_SESSION[UserUsecases::UPDATE_PASSWORD_ERROR_KEY] = "กรุณายืนยันรหัสผ่านใหม่";
       return;
     }
 
     if (strlen($newPassword) <= 7) {
-      $_SESSION[UserUsecases::ERROR_KEY] = "รหัสผ่านควรมีมากกว่าหรือเท่ากับ 8 ตัวอักษร";
+      $_SESSION[UserUsecases::UPDATE_PASSWORD_ERROR_KEY] = "รหัสผ่านควรมีมากกว่าหรือเท่ากับ 8 ตัวอักษร";
       return;
     }
 
     if (!password_verify($currentPassword, $user->password)) {
-      $_SESSION[UserUsecases::ERROR_KEY] = "รหัสผ่านไม่ถูกต้อง";
+      $_SESSION[UserUsecases::UPDATE_PASSWORD_ERROR_KEY] = "รหัสผ่านไม่ถูกต้อง";
       return;
     }
 
@@ -125,9 +130,9 @@ class UserUsecases implements IUserUsecases
 
     if ($newPassword === $confirmNewPasssword) {
       $this->userRepository->updateUser($userUpdate);
-      $_SESSION[UserUsecases::SUCCESS_KEY] = "แก้ไขรหัสผ่านสำเร็จแล้ว";
+      $_SESSION[UserUsecases::UPDATE_PASSWORD_SUCCESS_KEY] = "แก้ไขรหัสผ่านสำเร็จแล้ว";
     } else {
-      $_SESSION[UserUsecases::ERROR_KEY] = "รหัสผ่านใหม่ไม่ตรงกันกับยืนยันรหัสผ่านใหม่";
+      $_SESSION[UserUsecases::UPDATE_PASSWORD_ERROR_KEY] = "รหัสผ่านใหม่ไม่ตรงกันกับยืนยันรหัสผ่านใหม่";
     }
   }
 
@@ -135,10 +140,33 @@ class UserUsecases implements IUserUsecases
   {
     $user = $this->userRepository->getUserById($id);
     if (!password_verify($password, $user->password)) {
-      $_SESSION[UserUsecases::ERROR_DEACTIVATE_KEY] = "รหัสผ่านไม่ถูกต้อง";
+      $_SESSION[UserUsecases::DEACTIVATE_ERROR_KEY] = "รหัสผ่านไม่ถูกต้อง";
       return;
     }
 
     $this->userRepository->deactivateUserById($id);
+  }
+
+  public function updateFirstnameAndLastnameById(string $id, string $password, string $firstname, string $lastname): void
+  {
+    $user = $this->userRepository->getUserById($id);
+
+    if (!password_verify($password, $user->password)) {
+      $_SESSION[UserUsecases::UPDATE_PREFERENCES_ERROR_KEY] = "รหัสผ่านไม่ถูกต้อง";
+      return;
+    }
+
+    $user->firstname = $firstname;
+    $user->lastname = $lastname;
+
+    $this->userRepository->updateUser($user);
+    $_SESSION[UserUsecases::UPDATE_PREFERENCES_SUCCESS_KEY] = "แก้ไขข้อมูลสำเร็จ";
+    unset($_SESSION[UserUsecases::UPDATE_PREFERENCES_ERROR_KEY]);
+  }
+
+  public function getUsers(): array
+  {
+    $users = $this->userRepository->getUsers();
+    return $users;
   }
 }
