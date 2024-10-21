@@ -21,15 +21,18 @@ class AuthUsecases implements IAuthUsecases
     $this->userUsecases = $userUsecases;
   }
 
+  public static function RedirectSignIn(User | null $user)
+  {
+    if (!$user) {
+      header("Location: signin.php");
+    }
+  }
+
   public function authenticate(bool $redirect = true): User | null
   {
     if (isset($_SESSION[AuthUsecases::CURRENT_USER])) {
       $userId = $_SESSION[AuthUsecases::CURRENT_USER];
       return $this->userUsecases->getUserById($userId);
-    }
-
-    if ($redirect) {
-      header(REDIRECT_TO_SIGNIN);
     }
 
     return null;
@@ -48,7 +51,7 @@ class AuthUsecases implements IAuthUsecases
     }
 
     $user = $this->userUsecases->getUserByUsername($username);
-    if (!$user === null) {
+    if ($user === null) {
       $_SESSION[AuthUsecases::ERROR_KEY] = "ไม่พบผู้ใช้งานในระบบ";
       return;
     }
