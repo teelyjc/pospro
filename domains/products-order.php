@@ -16,9 +16,11 @@ class ProductsOrder
 interface IProductsOrderRepository
 {
   public function getTotalProductsFromOrderId(string $orderId): int;
+  public function addProductToOrderByProductsOrder(ProductsOrder $productsOrder): void;
 }
 
 interface IProductsOrderUsecases
 {
   public function getTotalProductsFromOrderId(string $orderId): int;
+  public function addProductToOrderByOrderId(string $productId, string $orderId): void;
 }

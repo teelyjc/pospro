@@ -6,6 +6,7 @@ require_once "./domains/products-order.php";
 require_once "./libs/mysql.php";
 
 use Domain\IProductsOrderRepository;
+use Domain\ProductsOrder;
 use Libs\MySQL;
 use Exception;
 use PDO;
@@ -33,6 +34,23 @@ class ProductsOrderRepository implements IProductsOrderRepository
       return $stmt->fetch()["total"];
     } catch (Exception $e) {
       die("Failed to get total products from order: " . $e->getMessage());
+    }
+  }
+
+  public function addProductToOrderByProductsOrder(ProductsOrder $productsOrder): void
+  {
+    try {
+      $stmt = $this->conn
+        ->prepare("INSERT INTO products_orders (id, product_id, order_id, created_at, updated_at)
+        VALUES (:id, :product_id, :order_id, NOW(), NOW())");
+
+      $stmt->bindParam(":id", $productsOrder->id, PDO::PARAM_STR);
+      $stmt->bindParam(":product_id", $productsOrder->productId, PDO::PARAM_STR);
+      $stmt->bindParam(":order_id", $productsOrder->orderId, PDO::PARAM_STR);
+
+      $stmt->execute();
+    } catch (Exception $e) {
+      die("Failed to add product to order from MySQL: " . $e->getMessage());
     }
   }
 }

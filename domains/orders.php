@@ -44,4 +44,6 @@ interface IOrderUsecases
 
   /** @return Order[] */
   public function getOrdersByUserId(string $userId): array;
+
+  public function getOrderById(string $orderId): Order | null;
 }

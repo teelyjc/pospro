@@ -52,4 +52,10 @@ class OrderUsecases implements IOrderUsecases
     $orders = $this->orderRepository->getOrdersByUserId($userId);
     return $orders;
   }
+
+  public function getOrderById(string $orderId): Order | null
+  {
+    $order = $this->orderRepository->getOrderById($orderId);
+    return $order;
+  }
 }
