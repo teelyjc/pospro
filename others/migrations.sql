@@ -45,7 +45,7 @@ CREATE TABLE
     `created_at` DATETIME,
     `updated_at` DATETIME,
     PRIMARY KEY (`id`),
-    FOREIGN KEY (`owner_id`) REFERENCES `users` (`id`),
+    FOREIGN KEY (`owner_id`) REFERENCES `users` (`id`)
   );
 
 CREATE TABLE
