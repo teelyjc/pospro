@@ -17,9 +17,20 @@ Header("หน้าแรก");
 Navbar();
 ?>
 <div class="container my-4">
+  <div class="alert alert-danger" role="alert">
+    <h4 class="alert-heading">คำเตือน</h4>
+    <p>
+      โปรเจ็คนี้กำลังอยู่ในช่วงพัฒนา อาจจะพบบัคและข้อผิดพลาด !<br>
+      ถ้าเจอปัญหาใดๆ สามารถเปิด Issue ได้ที่
+      <a href="https://github.com/teelyjc/pospro/issues" target="_blank">Github</a>
+    </p>
+    <hr>
+    <p>ตอนนี้เปิดเผยเป็น OpenSource สามารถเข้าชมได้
+      <a href="https://github.com/teelyjc/pospro" target="_blank">ที่นี่</a>
+    </p>
+  </div>
   <h1 class="text-center">
-    Cr-PosPro ทำเรื่องขายให้เป็นเรื่องง่าย<br>
-    ระบบ Point Of Sales ที่ประสิทธิภาพสูงด้วย PHP
+    Cr-PosPro เป็นโปรเจ็คที่เกี่ยวกับ Point Of Sales
   </h1>
 </div>
 
