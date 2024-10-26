@@ -59,13 +59,15 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
     $destination = __DIR__ . "/uploads/users/" . $user->id;
 
     $file = $destination . "/" . $_FILES["profile_image"]["name"];
+    // Keep this in database
     $filepath = "/users" . "/" . $user->id . "/" . $_FILES["profile_image"]["name"];
 
     if (!file_exists($destination)) {
-      if (mkdir($destination, 775, true)) {
-        move_uploaded_file($filename, $file);
-        $userUsecases->updateUserProfile($user->id, $filepath);
-      }
+      mkdir($destination, 0775, true);
+    }
+
+    if (move_uploaded_file($filename, $file)) {
+      $userUsecases->updateUserProfile($user->id, $filepath);
     }
   }
 }
