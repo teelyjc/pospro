@@ -1,0 +1,37 @@
+name: pospro
+
+services:
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - 3000:80
+    depends_on:
+      - maria
+    networks:
+      - internal
+
+  maria:
+    image: mariadb:10.4
+    restart: always
+    volumes:
+      - ./.mysql:/var/lib/mysql
+    environment:
+      MARIADB_ROOT_PASSWORD: password
+      TZ: Asia/Bangkok
+    networks:
+      - internal
+
+  phpmyadmin:
+    image: phpmyadmin:5
+    restart: always
+    environment:
+      PMA_HOST: maria
+    ports:
+      - 8000:80
+    networks:
+      - internal
+
+networks:
+  internal:

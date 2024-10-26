@@ -1,0 +1,10 @@
+.git
+.DS_Store
+.devcontainer/
+others/
+_README.md
+.editorconfig
+.gitignore
+README.md
+.mysql
+uploads/
