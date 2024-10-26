@@ -53,6 +53,7 @@ CREATE TABLE
     `id` VARCHAR(40) UNIQUE NOT NULL,
     `product_id` VARCHAR(100),
     `order_id` VARCHAR(100),
+    `quantity` INT,
     `created_at` DATETIME,
     `updated_at` DATETIME,
     PRIMARY KEY (`id`),
