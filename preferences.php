@@ -62,11 +62,11 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
     $filepath = "/users" . "/" . $user->id . "/" . $_FILES["profile_image"]["name"];
 
     if (!file_exists($destination)) {
-      mkdir($destination, 775, true);
+      if (mkdir($destination, 775, true)) {
+        move_uploaded_file($filename, $file);
+        $userUsecases->updateUserProfile($user->id, $filepath);
+      }
     }
-
-    move_uploaded_file($filename, $file);
-    $userUsecases->updateUserProfile($user->id, $filepath);
   }
 }
 
