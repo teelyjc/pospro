@@ -41,16 +41,28 @@ class ProductsOrderRepository implements IProductsOrderRepository
   {
     try {
       $stmt = $this->conn
-        ->prepare("INSERT INTO products_orders (id, product_id, order_id, created_at, updated_at)
-        VALUES (:id, :product_id, :order_id, NOW(), NOW())");
+        ->prepare("INSERT INTO products_orders (id, product_id, order_id, quantity, created_at, updated_at)
+        VALUES (:id, :product_id, :order_id, :quantity, NOW(), NOW())");
 
       $stmt->bindParam(":id", $productsOrder->id, PDO::PARAM_STR);
       $stmt->bindParam(":product_id", $productsOrder->productId, PDO::PARAM_STR);
+      $stmt->bindParam(":quantity", $productsOrder->quantity, PDO::PARAM_INT);
       $stmt->bindParam(":order_id", $productsOrder->orderId, PDO::PARAM_STR);
 
       $stmt->execute();
     } catch (Exception $e) {
       die("Failed to add product to order from MySQL: " . $e->getMessage());
+    }
+  }
+
+  public function deleteProductsFromProductsOrderByOrderId(string $orderId): void
+  {
+    try {
+      $stmt = $this->conn
+        ->prepare("DELETE FROM products_orders WHERE order_id = ?");
+      $stmt->execute([$orderId]);
+    } catch (Exception $e) {
+      die("Failed to delete products from products_order from MySQL: " . $e->getMessage());
     }
   }
 }

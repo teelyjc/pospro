@@ -4,11 +4,15 @@ session_start();
 
 require_once "./repositories/users.php";
 require_once "./repositories/products.php";
+require_once "./repositories/orders.php";
 require_once "./repositories/product-types.php";
+require_once "./repositories/products-order.php";
 require_once "./usecases/users.php";
 require_once "./usecases/auth.php";
 require_once "./usecases/products.php";
+require_once "./usecases/order.php";
 require_once "./usecases/product-types.php";
+require_once "./usecases/products-order.php";
 require_once "./libs/mysql.php";
 require_once "./libs/constants.php";
 
@@ -16,13 +20,18 @@ const CREAET_PRODUCT_KEY = "create_product";
 const CREATE_PRODUCT_TYPE_KEY = "create_product_type";
 const DELETE_PRODUCT_KEY = "delete_product_by_id";
 const UPDATE_PRODUCT_KEY = "update_product_by_id";
+const ADD_PRODUCT_TO_PRODUCTS_ORDER = "add_product_to_products_order";
 
 use Repository\UserRepository;
 use Usecases\UserUsecases;
 use Libs\MySQL;
+use Repository\OrderRepository;
 use Repository\ProductRepository;
+use Repository\ProductsOrderRepository;
 use Repository\ProductTypeRepository;
 use Usecases\AuthUsecases;
+use Usecases\OrderUsecases;
+use Usecases\ProductsOrderUsecases;
 use Usecases\ProductTypeUsecases;
 use Usecases\ProductUsecases;
 
@@ -31,17 +40,23 @@ $mysql = new MySQL();
 $userRepository = new UserRepository($mysql);
 $productRepository = new ProductRepository($mysql);
 $productTypeRepository = new ProductTypeRepository($mysql);
+$productsOrderRepository = new ProductsOrderRepository($mysql);
+$ordersRepository = new OrderRepository($mysql);
 
 $userUsecases = new UserUsecases($userRepository);
 $authUsecases = new AuthUsecases($userUsecases);
 $productTypeUsecases = new ProductTypeUsecases($productTypeRepository);
 $productUsecases = new ProductUsecases($productRepository);
+$orderUsecases = new OrderUsecases($ordersRepository, $userRepository);
+$productsOrderUsecases = new ProductsOrderUsecases($productUsecases, $orderUsecases, $productsOrderRepository);
 
 $user = $authUsecases->authenticate();
 AuthUsecases::RedirectSignIn($user);
 
 $productsPerPage = 10;
 $productsCurrentPages = 1;
+
+$ordersByUserId = $orderUsecases->getOrdersByUserId($user->id);
 
 /** Post's Method handlers for 3 actions */
 if ($_SERVER["REQUEST_METHOD"] === "POST") {
@@ -78,7 +93,29 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
     $price = isset($_POST["price"]) ? $_POST["price"] : 0;
     $quantity = isset($_POST["quantity"]) ? $_POST["quantity"] : 0;
 
-    $productUsecases->updateProductById($id, $name, $description, $price, $quantity);
+    if (
+      !empty($id) ||
+      !empty($name) ||
+      !empty($description) ||
+      !empty($price) ||
+      !empty($quantity)
+    ) {
+      $productUsecases->updateProductById($id, $name, $description, $price, $quantity);
+    }
+  }
+
+  if (isset($_POST[ADD_PRODUCT_TO_PRODUCTS_ORDER])) {
+    $id = isset($_POST["product_id"]) ? $_POST["product_id"] : "";
+    $order = isset($_POST["selected_order"]) ? $_POST["selected_order"] : "";
+    $quantity = isset($_POST["quantity"]) ? $_POST["quantity"] : 0;
+
+    if (
+      !empty($id) &&
+      !empty($order) &&
+      !empty($quantity)
+    ) {
+      $productsOrderUsecases->addProductToOrderByOrderId($id, $order, $quantity);
+    }
   }
 }
 
@@ -139,8 +176,7 @@ Navbar($user);
         <th scope="col">คำอธิบายสินค้า</th>
         <th scope="col">ราคา(บาท)</th>
         <th scope="col">จำนวน(ชิ้น)</th>
-        <th scope="col">แก้ไข</th>
-        <th scope="col">ลบ</th>
+        <th scope="col">การกระทำ</th>
       </tr>
     </thead>
     <tbody>
@@ -155,27 +191,53 @@ Navbar($user);
           <td><?= number_format($product->price) ?></td>
           <td><?= number_format($product->quantity) ?></td>
           <td>
-            <button
-              class="btn btn-warning w-100"
-              data-bs-toggle="modal"
-              data-bs-target="#updateProductModal"
-              data-id="<?= $product->id ?>"
-              data-name="<?= $product->name ?>"
-              data-description="<?= $product->description ?>"
-              data-price="<?= $product->price ?>"
-              data-quantity="<?= $product->quantity ?>">
-              แก้ไข</button>
-          </td>
-          <td>
-            <button
-              type="button"
-              class="btn btn-danger w-100"
-              data-bs-toggle="modal"
-              data-bs-target="#deleteProductModal"
-              data-id="<?= $product->id ?>"
-              data-name="<?= $product->name ?>">
-              ลบ
-            </button>
+            <div class="btn-group">
+              <button type="button" class="btn btn-warning dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
+                การกระทำ
+              </button>
+              <ul class="dropdown-menu">
+                <li>
+                  <button
+                    class="dropdown-item"
+                    data-bs-toggle="modal"
+                    data-bs-target="#updateProductModal"
+                    data-id="<?= $product->id ?>"
+                    data-name="<?= $product->name ?>"
+                    data-description="<?= $product->description ?>"
+                    data-price="<?= $product->price ?>"
+                    data-quantity="<?= $product->quantity ?>">
+                    แก้ไข
+                  </button>
+                </li>
+                <li>
+                  <button
+                    class="dropdown-item"
+                    data-bs-toggle="modal"
+                    data-bs-target="#addProductToProductsOrder"
+                    data-id="<?= $product->id ?>"
+                    data-name="<?= $product->name ?>"
+                    data-description="<?= $product->description ?>"
+                    data-price="<?= $product->price ?>"
+                    data-quantity="<?= $product->quantity ?>">
+                    เพิ่มสินค้าเข้าออเดอร์
+                  </button>
+                </li>
+                <li>
+                  <hr class="dropdown-divider">
+                </li>
+                <li>
+                  <button
+                    type="button"
+                    class="dropdown-item text-danger"
+                    data-bs-toggle="modal"
+                    data-bs-target="#deleteProductModal"
+                    data-id="<?= $product->id ?>"
+                    data-name="<?= $product->name ?>">
+                    ลบ
+                  </button>
+                </li>
+              </ul>
+            </div>
           </td>
         </tr>
       <?php
@@ -353,9 +415,54 @@ Navbar($user);
   </form>
 </div>
 
+<div class="modal fade" id="addProductToProductsOrder" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="addProductToProductsOrderLabel" aria-hidden="true">
+  <form method="POST">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="addProductToProductsOrderLabel">เพิ่มสินค้าชิ้นนี้เข้าออเดอร์</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          <div class="mb-3">
+            <label for="name" class="form-label">รหัสสินค้า</label>
+            <input type="text" id="id" name="product_id" class="form-control" readonly>
+          </div>
+          <div class="mb-3">
+            <label for="name" class="form-label">ชื่อสินค้า</label>
+            <input type="text" id="name" name="product_name" class="form-control" readonly>
+          </div>
+          <div class="mb-3">
+            <label for="order" class="form-label">เลือกออเดอร์ที่ต้องการเพิ่ม</label>
+            <select name="selected_order" id="selected_order" class="form-select">
+              <option selected value="">กรุณาเลือกออเดอร์ที่ต้องการเพิ่ม</option>
+              <?php
+              foreach ($ordersByUserId as $order) {
+              ?>
+                <option value="<?= $order->id ?>"><?= $order->label ?></option>
+              <?php
+              }
+              ?>
+            </select>
+          </div>
+          <div class="mb-3">
+            <label for="quantity" class="form-label">จำนวนสินค้าที่จะเพิ่มเข้าไปในออเดอร์</label>
+            <input type="number" id="quantity" name="quantity" class="form-control">
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">ยกเลิก</button>
+          <button type="submit" name="<?= ADD_PRODUCT_TO_PRODUCTS_ORDER ?>" class="btn btn-warning">เพิ่มสินค้าเข้าออเดอร์</button>
+        </div>
+      </div>
+    </div>
+  </form>
+</div>
+
 <script>
   let deleteProductModal = document.getElementById("deleteProductModal");
   let updateProductModal = document.getElementById("updateProductModal");
+  let addProductToProductsOrderModal = document.getElementById("addProductToProductsOrder");
 
   deleteProductModal.addEventListener("show.bs.modal", (e) => {
     let btn = e.relatedTarget;
@@ -381,7 +488,17 @@ Navbar($user);
     updateProductModal.querySelector("#description").value = productDescription;
     updateProductModal.querySelector("#price").value = productPrice;
     updateProductModal.querySelector("#quantity").value = productQuantity;
-  })
+  });
+
+  addProductToProductsOrderModal.addEventListener("show.bs.modal", (e) => {
+    let btn = e.relatedTarget;
+
+    let productId = btn.getAttribute("data-id");
+    let productName = btn.getAttribute("data-name");
+
+    addProductToProductsOrderModal.querySelector("#id").value = productId;
+    addProductToProductsOrderModal.querySelector("#name").value = productName;
+  });
 </script>
 
 <?php Footer(); ?>

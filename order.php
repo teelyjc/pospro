@@ -3,9 +3,11 @@ session_start();
 
 require_once "./repositories/users.php";
 require_once "./repositories/orders.php";
+require_once "./repositories/products.php";
 require_once "./repositories/products-order.php";
 require_once "./usecases/users.php";
 require_once "./usecases/auth.php";
+require_once "./usecases/products.php";
 require_once "./usecases/order.php";
 require_once "./usecases/products-order.php";
 require_once "./libs/mysql.php";
@@ -15,20 +17,25 @@ use Repository\UserRepository;
 use Usecases\UserUsecases;
 use Libs\MySQL;
 use Repository\OrderRepository;
+use Repository\ProductRepository;
 use Repository\ProductsOrderRepository;
 use Usecases\AuthUsecases;
 use Usecases\OrderUsecases;
 use Usecases\ProductsOrderUsecases;
+use Usecases\ProductUsecases;
 
 $mysql = new MySQL();
 
 $userRepository = new UserRepository($mysql);
 $orderRepository = new OrderRepository($mysql);
+$productsRepository = new ProductRepository($mysql);
 $productsOrderRepository = new ProductsOrderRepository($mysql);
+
 $userUsecases = new UserUsecases($userRepository);
 $authUsecases = new AuthUsecases($userUsecases);
 $orderUsecases = new OrderUsecases($orderRepository, $userRepository);
-$productsOrderUsecases = new ProductsOrderUsecases($productsOrderRepository);
+$productsUsecases = new ProductUsecases($productsRepository);
+$productsOrderUsecases = new ProductsOrderUsecases($productsUsecases, $orderUsecases, $productsOrderRepository);
 
 const CREATE_ORDER = "createOrder";
 const DELETE_ORDER = "deleteOrder";
@@ -47,6 +54,8 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
 
   if (isset($_POST[DELETE_ORDER])) {
     $orderId = isset($_POST["order_id"]) ? $_POST["order_id"] : "";
+
+    $productsOrderUsecases->deleteProductsFromProductsOrderByOrderId($orderId);
     $orderUsecases->deleteOrderById($orderId);
   }
 
@@ -117,7 +126,8 @@ Navbar($user);
               type="button"
               class="btn btn-danger w-100"
               data-bs-toggle="modal"
-              data-bs-target="#deleteOrderModal">
+              data-bs-target="#deleteOrderModal"
+              data-name="<?= $order->label ?>">
               ลบ
             </button>
           </td>
@@ -208,12 +218,9 @@ Navbar($user);
 
   deleteOrderModal.addEventListener("show.bs.modal", (e) => {
     let btn = e.relatedTarget;
-
-    let id = btn.getAttribute("data-id");
     let name = btn.getAttribute("data-name")
 
     deleteOrderModal.querySelector("#order-name").textContent = name;
-    deleteOrderModal.querySelector("#order-id").value = id;
   });
 
   updateOrderModal.addEventListener("show.bs.modal", (e) => {

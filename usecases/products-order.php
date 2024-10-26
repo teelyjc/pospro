@@ -29,17 +29,31 @@ class ProductsOrderUsecases implements IProductsOrderUsecases
     return $this->productOrderRepository->getTotalProductsFromOrderId($orderId);
   }
 
-  public function addProductToOrderByOrderId(string $productId, string $orderId): void
+  public function addProductToOrderByOrderId(string $productId, string $orderId, int $quantity): void
   {
     /** For products and order validation */
     $order = $this->orderUsecases->getOrderById($orderId);
     $product = $this->productUsecases->getProductById($productId);
 
+    if (empty($order->id)) {
+      return;
+    }
+
+    if (empty($product->id)) {
+      return;
+    }
+
     $productsOrder = new ProductsOrder();
     $productsOrder->id = Generator::UUID();
     $productsOrder->productId = $product->id;
     $productsOrder->orderId = $order->id;
+    $productsOrder->quantity = $quantity;
 
     $this->productOrderRepository->addProductToOrderByProductsOrder($productsOrder);
+  }
+
+  public function deleteProductsFromProductsOrderByOrderId(string $orderId): void
+  {
+    $this->productOrderRepository->deleteProductsFromProductsOrderByOrderId($orderId);
   }
 }
